@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StolpeKalkulator PWA</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIlN0b2xwZUthbGt1bGF0b3IiLAogICJzaG9ydF9uYW1lIjogIlN0b2xwZUthbGsiLAogICJzdGFydF91cmwiOiAiLiIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiI2Y4ZmE2YyIsCiAgInRoZW1lX2NvbG9yIjogIiMxZTNiOGMiCn0=">
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen">
+
+    <div class="max-w-2xl mx-auto px-4 py-6">
+        <header class="bg-blue-950 text-white p-4 rounded-t-xl shadow-md text-center">
+            <h1 class="text-xl font-bold tracking-wide text-amber-400">STOLPEKONTROLL</h1>
+            <p class="text-xs text-gray-300 mt-1">Estimering av restlevetid for stolper med innvendig råte</p>
+        </header>
+
+        <main class="bg-white p-6 rounded-b-xl shadow-md border-x border-b border-gray-200 space-y-6">
+            
+            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3 border-b pb-1">1. Stamdata & Lokasjon</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Netteier</label>
+                        <input type="text" id="netteier" placeholder="F.eks. Elvia" class="w-full p-2 border rounded bg-white text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Linje ID</label>
+                        <input type="text" id="linjeid" placeholder="Linjenavn/ID" class="w-full p-2 border rounded bg-white text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Mast nr.</label>
+                        <input type="text" id="mastnr" placeholder="Eks. 14" class="w-full p-2 border rounded bg-white text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Stolpe nr.</label>
+                        <input type="text" id="stolpenr" placeholder="Eks. 1" class="w-full p-2 border rounded bg-white text-sm">
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3 border-b pb-1">2. Fysiske mål & Alder</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Høyde på stolpe (m)</label>
+                        <input type="number" id="hoyde" placeholder="m" class="w-full p-2 border rounded bg-white text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Jordband (mm)</label>
+                        <input type="number" id="jordband" placeholder="Diameter mm" class="w-full p-2 border rounded bg-white text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Årstallmerke på stolpe</label>
+                        <input type="number" id="montertAar" placeholder="Eks. 1985" class="w-full p-2 border rounded bg-white text-sm" onchange="oppdaterAlder()">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Årstall kontrollert</label>
+                        <input type="number" id="kontrollertAar" class="w-full p-2 border rounded bg-white text-sm" onchange="oppdaterAlder()">
+                    </div>
+                </div>
+                <div class="text-xs text-right mt-2 text-gray-500 font-medium" id="alderVisning">Aktiv alder ved kontroll: - år</div>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3 border-b pb-1">3. Grunnlag & Jordsmonn</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Benytt forhåndstall som grunnlag (Jordsmonn)</label>
+                        <select id="jordsmonn" class="w-full p-2.5 border rounded bg-white text-sm font-medium" onchange="oppdaterGrunnlagstal()">
+                            <option value="">-- Velg jordsmonn fra listen --</option>
+                            <option value="fjell">Fjellfundament og høyfjell</option>
+                            <option value="myr">Myr / morene / skogsmark</option>
+                            <option value="asfalt">Asfalt / betong</option>
+                            <option value="dyrka">Dyrka mark</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Estimert råtestart (antall år)</label>
+                            <input type="number" id="raatestart" class="w-full p-2 border rounded bg-white text-sm" placeholder="Hentes fra Sintef/liste">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Målt tverrsnittstap (Råtefaktor mm/år)</label>
+                            <input type="number" id="raatefaktor" step="0.01" class="w-full p-2 border rounded bg-white text-sm" placeholder="mm per år">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-amber-50/50 p-4 rounded-lg border border-amber-200">
+                <h2 class="text-sm font-semibold text-amber-800 uppercase tracking-wider mb-3 border-b border-amber-200 pb-1">4. Tilstandskontroll (Innvendig Råte)</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-amber-900 mb-1">Utskiftingsterskel restskall (mm)</label>
+                        <input type="number" id="utskiftingGrense" value="35" class="w-full p-2 border border-amber-300 rounded bg-white text-sm font-bold text-center">
+                        <span class="text-[10px] text-gray-500 block mt-1 text-center">Bestemmes av netteier</span>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-amber-900 mb-1">MÅLT restskall i dag (mm)</label>
+                        <input type="number" id="maaltRestskall" placeholder="Tast inn måling" class="w-full p-2 border border-amber-400 rounded bg-white text-sm font-bold text-center text-blue-900 focus:ring-2 focus:ring-amber-400">
+                        <span class="text-[10px] text-gray-500 block mt-1 text-center">Fra boreprøve/instrument</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between bg-emerald-50 p-4 rounded-lg border border-emerald-200">
+                <div class="pr-2">
+                    <h3 class="text-sm font-bold text-emerald-900">Utfør etterimpregnering / bandasjering?</h3>
+                    <p class="text-xs text-emerald-700">Legger til 5–8 år ekstra restlevetid og utsetter neste kontrollperiode.</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer select-none">
+                    <input type="checkbox" id="reimpregnert" class="sr-only peer">
+                    <div class="w-14 h-7 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-emerald-600"></div>
+                </label>
+            </div>
+
+            <button onclick="beregnRestlevetid()" class="w-full bg-blue-900 hover:bg-blue-950 text-white font-bold py-3 px-4 rounded-lg shadow transition transform active:scale-95 text-center text-md tracking-wide cursor-pointer">
+                BEREGN ESTIMERT RESTLEVETID
+            </button>
+
+            <div id="resultatSeksjon" class="hidden transition-all duration-300">
+                <div id="resultatKort" class="p-5 rounded-xl border text-center space-y-4 shadow-inner">
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-gray-600">BEREGNET STATUS</h2>
+                    
+                    <div class="grid grid-cols-2 gap-2 max-w-sm mx-auto">
+                        <div class="bg-white/80 p-3 rounded border border-black/10">
+                            <span class="block text-[10px] uppercase font-bold text-gray-500">Restlevetid</span>
+                            <span id="resRestlevetid" class="text-2xl font-black text-gray-900">- år</span>
+                        </div>
+                        <div class="bg-white/80 p-3 rounded border border-black/10">
+                            <span class="block text-[10px] uppercase font-bold text-gray-500">Utskiftingsår</span>
+                            <span id="resUtskiftingsAar" class="text-2xl font-black text-gray-900">-</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white/90 p-3 rounded-lg max-w-md mx-auto text-sm border border-black/5 text-left space-y-1">
+                        <p class="text-xs text-gray-600 font-medium" id="resKonklusjonTekst"></p>
+                        <p class="font-bold text-gray-900" id="resNesteKontroll"></p>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        // Sett inneværende år automatisk som standard for kontrollår
+        document.getElementById('kontrollertAar').value = new Date().getFullYear();
+
+        // Datatabell basert på kvalifisert gjetteevne og Sintef-rapporter
+        const jordsmonnData = {
+            fjell:   { raatestart: 30, raatefaktor: 0.15 },
+            myr:     { raatestart: 15, raatefaktor: 0.40 },
+            asfalt:  { raatestart: 20, raatefaktor: 0.25 },
+            dyrka:   { raatestart: 12, raatefaktor: 0.50 }
+        };
+
+        function oppdaterAlder() {
+            const montert = parseInt(document.getElementById('montertAar').value);
+            const kontrollert = parseInt(document.getElementById('kontrollertAar').value);
+            
+            if (montert && kontrollert) {
+                const alder = kontrollert - montert;
+                document.getElementById('alderVisning').innerText = `Aktiv alder ved kontroll: ${alder} år`;
+            }
+        }
+
+        function oppdaterGrunnlagstal() {
+            const valgtJord = document.getElementById('jordsmonn').value;
+            if (valgtJord && jordsmonnData[valgtJord]) {
+                document.getElementById('raatestart').value = jordsmonnData[valgtJord].raatestart;
+                document.getElementById('raatefaktor').value = jordsmonnData[valgtJord].raatefaktor;
+            }
+        }
+
+        function beregnRestlevetid() {
+            // Hent verdier fra inputfelt
+            const kontrollertAar = parseInt(document.getElementById('kontrollertAar').value) || new Date().getFullYear();
+            const montertAar = parseInt(document.getElementById('montertAar').value);
+            const raatestartEtterAar = parseInt(document.getElementById('raatestart').value) || 15;
+            const raatefaktor = parseFloat(document.getElementById('raatefaktor').value) || 0.4;
+            const utskiftingGrense = parseFloat(document.getElementById('utskiftingGrense').value) || 35;
+            const maaltRestskall = parseFloat(document.getElementById('maaltRestskall').value);
+            const isReimpregnert = document.getElementById('reimpregnert').checked;
+
+            // Validering av kritiske data
+            if (!maaltRestskall || isNaN(maaltRestskall)) {
+                alert("Vennligst tast inn målt restskall i millimeter før beregning.");
+                return;
+            }
+            if (!montertAar || isNaN(montertAar)) {
+                alert("Vennligst fyll ut årstallmerke (monteringsår) for stolpen.");
+                return;
+            }
+
+            // --- BEREGNINGSLOGIKK ---
+            const faktiskAlderNuh = kontrollertAar - montertAar;
+            
+            // Beregn hvor mange mm tverrsnitt (skall) som teoretisk gjenstår til grensen er nådd
+            const marginIgjenMm = maaltRestskall - utskiftingGrense;
+            
+            let estimertRestlevetid = 0;
+
+            if (marginIgjenMm <= 0) {
+                // Stolpen har allerede nådd eller gått under sikkerhetsgrensen
+                estimertRestlevetid = 0;
+            } else {
+                // Beregn år basert på gjenværende tverrsnitt delt på årlig råtehastighet
+                estimertRestlevetid = Math.round(marginIgjenMm / raatefaktor);
+            }
+
+            // Hvis reimpregnering velges, legg til en forlenget levetidsbonus (vi bruker midt på: 7 år)
+            let bonusAar = 0;
+            if (isReimpregnert && marginIgjenMm > 0) {
+                bonusAar = 7; // Skalaen din var 5 til 8 år
+                estimertRestlevetid += bonusAar;
+            }
+
+            const anbefaltUtskiftetAar = kontrollertAar + estimertRestlevetid;
+
+            // Fastsett kontrollintervaller basert på tilstand og tiltak
+            let nesteKontrollOmAar = 10; // Standard for friske stolper
+            if (estimertRestlevetid <= 5) {
+                nesteKontrollOmAar = 2; // Kritisk, hyppig overvåking
+            } else if (estimertRestlevetid <= 12) {
+                nesteKontrollOmAar = 5; // Moderat risiko
+            } else if (isReimpregnert) {
+                nesteKontrollOmAar = 10; // Trygt å sette til 10 år pga. ny kjemi
+            }
+
+            // --- VISNING OG FARGEKODING (UI) ---
+            const resSeksjon = document.getElementById('resultatSeksjon');
+            const resKort = document.getElementById('resultatKort');
+            
+            resSeksjon.classList.remove('hidden');
+
+            // Fargekoding etter alvorlighetsgrad
+            resKort.className = "p-5 rounded-xl border text-center space-y-4 shadow-md transition-colors duration-300 ";
+            if (estimertRestlevetid === 0) {
+                resKort.classList.add("bg-red-100", "border-red-400", "text-red-950");
+                document.getElementById('resKonklusjonTekst').innerText = `Stolpen har nådd eller underskredet utskiftingsgrensen på ${utskiftingGrense} mm.`;
+                document.getElementById('resNesteKontroll').innerText = "TILTAK: Må rødmerkes og skiftes ut snarest.";
+            } else if (estimertRestlevetid <= 7) {
+                resKort.classList.add("bg-amber-100", "border-amber-400", "text-amber-950");
+                document.getElementById('resKonklusjonTekst').innerText = `Stolpen har begrenset restlevetid igjen før den når ${utskiftingGrense} mm.`;
+                document.getElementById('resNesteKontroll').innerText = `TILTAK: Overvåkes. Neste obligatoriske kontroll om ${nesteKontrollOmAar} år (${kontrollertAar + nesteKontrollOmAar}).`;
+            } else {
+                resKort.classList.add("bg-emerald-100", "border-emerald-400", "text-emerald-950");
+                let tekst = `Stolpen har tilfredsstillende tykkelse.`;
+                if (isReimpregnert) tekst += ` Behandlingen har utsatt det biologiske angrepet med ca. 7 år.`;
+                document.getElementById('resKonklusjonTekst').innerText = tekst;
+                document.getElementById('resNesteKontroll').innerText = `Neste planlagte kontrollperiode: Om ${nesteKontrollOmAar} år (${kontrollertAar + nesteKontrollOmAar}).`;
+            }
+
+            // Skriv tall til skjerm
+            document.getElementById('resRestlevetid').innerText = `${estimertRestlevetid} år`;
+            document.getElementById('resUtskiftingsAar').innerText = anbefaltUtskiftetAar;
+        }
+
+        // --- OFFLINE/PWA SERVICE WORKER ---
+        // Denne kodesnutten gjør at nettleseren lagrer appen lokalt i minnet
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                const CACHE_NAME = 'stolpe-calc-v1';
+                self.addEventListener('install', e => {
+                    e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(['./', './index.html'])));
+                });
+                self.addEventListener('fetch', e => {
+                    e.respondWith(caches.match(e.request).then(response => response || fetch(e.request)));
+                });
+            `;
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            const workerUrl = URL.createObjectURL(blob);
+            navigator.serviceWorker.register(workerUrl).catch(err => console.log('SW feil:', err));
+        }
+    </script>
+</body>
+</html>
