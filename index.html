@@ -6,8 +6,8 @@
     <title>E.T. – Råtesjekk</title>
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
-    <link rel="apple-touch-icon" href="icon.png">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="manifest" href="manifest.json">
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans min-h-screen">
 
@@ -208,7 +208,7 @@
             } else if (estimertRestlevetid <= 8) {
                 resKort.classList.add("bg-amber-100", "border-amber-300", "text-amber-950");
                 document.getElementById('resKonklusjonTekst').innerText = `E.T. har beregnet begrenset margin før stolpen når ${utskiftingGrense} mm.`;
-                document.getElementById('resNesteKontroll').innerText = `TILTAK: Neste obligatoriske kontroll om ${nesteKontrollOmAar} år (${kontrollertAar + nesteKontrollOmAar}).`;
+                document.getElementById('resNesteKontroll').innerText = `TILTAK: Next obligatoriske kontroll om ${nesteKontrollOmAar} år (${kontrollertAar + nesteKontrollOmAar}).`;
             } else {
                 resKort.classList.add("bg-green-100", "border-green-300", "text-green-950");
                 let tekst = `Stolpen har en godkjent sikkerhetsmargin.`;
@@ -224,7 +224,7 @@
         // --- OFFLINE SERVICE WORKER ---
         if ('serviceWorker' in navigator) {
             const swCode = `
-              const CACHE_NAME = 'et-rotesjekk-v3';
+                const CACHE_NAME = 'et-raatesjekk-v4';
                 self.addEventListener('install', e => {
                     e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(['./', './index.html', './icon.png'])));
                 });
@@ -239,4 +239,3 @@
     </script>
 </body>
 </html>
-
