@@ -1,10 +1,10 @@
 {
-  "name": "E.T. Det fantastiske romvesenet",
+  "name": "E.T. Råtesjekk",
   "short_name": "E.T.",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#064e3b",
-  "theme_color": "#064e3b",
+  "background_color": "#15803d",
+  "theme_color": "#15803d",
   "icons": [
     {
       "src": "icon.png",
