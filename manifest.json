@@ -1,6 +1,8 @@
 {
-  "name": "E.T. Råtesjekk",
-  "short_name": "E.T.",
+  "name": "E.T. Råtesjekk NY", 
+  "short_name": "E.T. NY",
+  ...
+}
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#15803d",
