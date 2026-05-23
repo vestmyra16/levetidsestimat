@@ -127,6 +127,12 @@
             dyrka:   { raatestart: 12, raatefaktor: 0.50 }
         };
 
+        // --- HENT LAGREDE DATA VED OPPSTART ---
+        window.onload = () => {
+            document.getElementById('netteier').value = localStorage.getItem('netteier') || '';
+            document.getElementById('linjemast').value = localStorage.getItem('linjemast') || '';
+        };
+
         function oppdaterAlder() {
             const montert = parseInt(document.getElementById('montertAar').value);
             const kontrollert = parseInt(document.getElementById('kontrollertAar').value);
@@ -145,21 +151,16 @@
         }
 
         function beregnRestlevetid() {
+            // Lagre verdier til localStorage HVER GANG vi beregner
+            localStorage.setItem('netteier', document.getElementById('netteier').value);
+            localStorage.setItem('linjemast', document.getElementById('linjemast').value);
+
             const kontrollertAar = parseInt(document.getElementById('kontrollertAar').value) || new Date().getFullYear();
             const montertAar = parseInt(document.getElementById('montertAar').value);
             const raatefaktor = parseFloat(document.getElementById('raatefaktor').value) || 0.40;
             const utskiftingGrense = parseFloat(document.getElementById('utskiftingGrense').value) || 35;
             const maaltRestskall = parseFloat(document.getElementById('maaltRestskall').value);
             const isReimpregnert = document.getElementById('reimpregnert').checked;
-            // Lagre verdier til localStorage
-localStorage.setItem('netteier', document.getElementById('netteier').value);
-localStorage.setItem('linjemast', document.getElementById('linjemast').value);
-
-// Hent dem ved oppstart (legg inn i <script> på bunnen)
-window.onload = () => {
-    document.getElementById('netteier').value = localStorage.getItem('netteier') || '';
-    document.getElementById('linjemast').value = localStorage.getItem('linjemast') || '';
-};
 
             if (isNaN(maaltRestskall) || !maaltRestskall) {
                 alert("Vennligst tast inn målt restskall i millimeter før beregning.");
@@ -180,24 +181,17 @@ window.onload = () => {
                 estimertRestlevetid = Math.round(marginIgjenMm / raatefaktor);
             }
 
-            // BonusAar fra etterimpregnering
             if (isReimpregnert && marginIgjenMm > 0) {
                 estimertRestlevetid += 7;
             }
 
             const anbefaltUtskiftetAar = kontrollertAar + estimertRestlevetid;
 
-            // Kontrollintervaller
             let nesteKontrollOmAar = 10;
-            if (estimertRestlevetid <= 5) {
-                nesteKontrollOmAar = 2;
-            } else if (estimertRestlevetid <= 12) {
-                nesteKontrollOmAar = 5;
-            } else if (isReimpregnert) {
-                nesteKontrollOmAar = 10;
-            }
+            if (estimertRestlevetid <= 5) nesteKontrollOmAar = 2;
+            else if (estimertRestlevetid <= 12) nesteKontrollOmAar = 5;
+            else if (isReimpregnert) nesteKontrollOmAar = 10;
 
-            // --- VISNING OG UI ---
             const resSeksjon = document.getElementById('resultatSeksjon');
             const resKort = document.getElementById('resultatKort');
             
@@ -227,7 +221,7 @@ window.onload = () => {
         // --- OFFLINE SERVICE WORKER ---
         if ('serviceWorker' in navigator) {
             const swCode = `
-                const CACHE_NAME = 'et-rotesjekk-v1';
+                const CACHE_NAME = 'et-rotesjekk-v2';
                 self.addEventListener('install', e => {
                     e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(['./', './index.html', './icon.png'])));
                 });
