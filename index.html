@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E.T. – Råtesjekk</title>
+    <title>E.T. – Råtesjekk v7</title>
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
@@ -15,21 +15,27 @@
         <header class="bg-green-700 text-white p-5 rounded-t-xl shadow-md text-center flex flex-col items-center justify-center">
             <img src="icon.png" alt="E.T. Råtesjekk" class="w-24 h-24 mb-3 rounded-xl shadow-md">
             <h1 class="text-3xl font-black tracking-tighter text-amber-300">E.T.</h1>
-            <p class="text-xs text-green-100 mt-1 uppercase tracking-wider font-bold">Råtesjekk – Estimert restlevetid</p>
+            <p class="text-xs text-green-100 mt-1 uppercase tracking-wider font-bold">Råtesjekk – Dokumentasjon & Restlevetid</p>
         </header>
 
         <main class="bg-white p-6 rounded-b-xl shadow-md border-x border-b border-gray-200 space-y-6 overflow-hidden">
             
             <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
                 <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 border-b pb-1">1. Stamdata & Lokasjon</h2>
-                <div class="grid grid-cols-2 gap-3">
+                <div class="space-y-3">
                     <div>
                         <label class="block text-[11px] font-medium text-gray-600 mb-0.5">Netteier / Kontrollør</label>
                         <input type="text" id="netteier" placeholder="Eks. Elvia" class="w-full p-2 border rounded bg-white text-sm">
                     </div>
-                    <div>
-                        <label class="block text-[11px] font-medium text-gray-600 mb-0.5">Linje / Mast nr.</label>
-                        <input type="text" id="linjemast" placeholder="Linje-12 / Mast-4" class="w-full p-2 border rounded bg-white text-sm">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-medium text-gray-600 mb-0.5">Linje / Mast nr.</label>
+                            <input type="text" id="linjemast" placeholder="Mastepunkt nr." class="w-full p-2 border rounded bg-white text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-medium text-gray-600 mb-0.5">Stolpe nr. (Gjelder spesifikk stolpe)</label>
+                            <input type="text" id="stolpeNr" placeholder="Eks. Stolpe 3 / B-bein" class="w-full p-2 border rounded bg-white text-sm">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -48,13 +54,13 @@
                         </div>
                     </div>
                     <div>
-                        <label class="block text-[11px] font-medium text-gray-600 mb-0.5">Benytt forhåndstall for Jordsmonn</label>
+                        <label class="block text-[11px] font-medium text-gray-600 mb-0.5">Jordsmonn (Korrigerte og strengere faktorer)</label>
                         <select id="jordsmonn" class="w-full p-2.5 border rounded bg-white text-sm font-medium" onchange="oppdaterGrunnlagstal()">
                             <option value="">-- Velg grunnlag fra listen --</option>
-                            <option value="fjell">Fjellfundament / Høyfjell</option>
-                            <option value="myr">Myr / morene / skogsmark</option>
-                            <option value="asfalt">Asfalt / betong</option>
-                            <option value="dyrka">Dyrka mark</option>
+                            <option value="fjell">Fjellfundament / Høyfjell (0.20 mm/år)</option>
+                            <option value="asfalt">Asfalt / betong (0.55 mm/år)</option>
+                            <option value="myr">Myr / morene / skogsmark (0.45 mm/år)</option>
+                            <option value="dyrka">Dyrka mark (0.65 mm/år)</option>
                         </select>
                     </div>
                     <div class="text-xs text-right mt-1.5 text-gray-500 font-medium" id="alderVisning">Aktiv alder ved kontroll: - år</div>
@@ -73,30 +79,52 @@
                         <input type="number" id="maaltRestskall" placeholder="Tast inn" class="w-full p-2 border border-amber-400 rounded bg-white text-lg font-black text-center text-blue-950 focus:ring-2 focus:ring-amber-400">
                     </div>
                 </div>
-                <div class="hidden grid-cols-2 gap-3 mt-3">
-                    <input type="number" id="raatefaktor" step="0.01" class="w-full p-1 border rounded text-xs" placeholder="Råtefaktor (mm/år)">
+                <div class="hidden">
+                    <input type="number" id="raatefaktor" step="0.01">
+                </div>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-2">
+                <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider border-b pb-1">4. Fotodokumentasjon</h2>
+                <div class="flex items-center space-x-3">
+                    <label class="w-full flex flex-col items-center px-4 py-2 bg-white text-gray-700 rounded-lg border shadow-sm tracking-wide uppercase border-blue-200 cursor-pointer hover:bg-blue-50 transition text-xs font-bold">
+                        <span id="bildeTekst">📷 Ta eller velg bilde av stolpen</span>
+                        <input type="file" accept="image/*" id="stolpeBilde" class="hidden" onchange="handterBilde(this)">
+                    </label>
+                </div>
+                <div id="bildeForhandsvisningSeksjon" class="hidden flex justify-center pt-2">
+                    <img id="bildeVisning" class="max-h-48 rounded-lg shadow-md border border-gray-300">
                 </div>
             </div>
 
             <div class="flex items-center justify-between bg-green-50 p-4 rounded-lg border border-green-200">
                 <div class="pr-2">
-                    <h3 class="text-sm font-bold text-green-900">Reimpregneres (bandasjeres) nå?</h3>
-                    <p class="text-xs text-green-700">Utsetter videre råte og forlenger levetiden med 7 år.</p>
+                    <h3 class="text-sm font-bold text-green-900">Dryppimpregneres (borehull) nå?</h3>
+                    <p class="text-xs text-green-700">Tilstrekkelig drypping utsetter råte og forlenger levetid med ca. 7 år.</p>
                 </div>
                 <label class="relative inline-flex items-center cursor-pointer select-none">
-                    <input type="checkbox" id="reimpregnert" class="sr-only peer">
+                    <input type="checkbox" id="drypping" class="sr-only peer">
                     <div class="w-14 h-7 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-600"></div>
                 </label>
             </div>
 
-            <button onclick="beregnRestlevetid()" class="w-full bg-green-800 hover:bg-green-900 text-white font-bold py-3 px-4 rounded-lg shadow-lg text-center text-md tracking-wide cursor-pointer transition transform active:scale-95">
-                BEREGN ESTIMERT RESTLEVETID (E.T.)
-            </button>
+            <div class="space-y-2">
+                <button onclick="beregnRestlevetid()" class="w-full bg-green-800 hover:bg-green-900 text-white font-bold py-3 px-4 rounded-lg shadow-lg text-center text-md tracking-wide cursor-pointer transition transform active:scale-95">
+                    BEREGN & GENERER RAPPORT
+                </button>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="lagreTilLokaltMinne()" class="bg-blue-800 hover:bg-blue-900 text-white text-xs font-bold py-2 rounded shadow cursor-pointer">
+                        💾 LAGRE I HISTORIKK
+                    </button>
+                    <button onclick="eksporterTilExcel()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2 rounded shadow cursor-pointer">
+                        📊 EKSPORTER TIL EXCEL
+                    </button>
+                </div>
+            </div>
 
             <div id="resultatSeksjon" class="hidden transition-all duration-300">
                 <div id="resultatKort" class="p-6 rounded-xl border text-center space-y-4 shadow-inner">
                     <h2 class="text-xs font-bold uppercase tracking-widest text-gray-600">E.T. RÅTESJEKK KONKLUSJON</h2>
-                    
                     <div class="grid grid-cols-2 gap-2 max-w-sm mx-auto">
                         <div class="bg-white/90 p-3 rounded-lg border border-black/10">
                             <span class="block text-[10px] uppercase font-bold text-gray-500">Restlevetid</span>
@@ -107,7 +135,6 @@
                             <span id="resUtskiftingsAar" class="text-3xl font-black text-gray-900">-</span>
                         </div>
                     </div>
-
                     <div class="bg-white/95 p-3.5 rounded-lg text-sm border border-black/5 text-left space-y-1.5 max-w-md mx-auto shadow-inner">
                         <p class="text-xs text-gray-700 font-medium" id="resKonklusjonTekst"></p>
                         <p class="font-bold text-gray-950" id="resNesteKontroll"></p>
@@ -119,30 +146,41 @@
     </div>
 
     <script>
-        // Sett inneværende år automatisk som standard
         document.getElementById('kontrollertAar').value = new Date().getFullYear();
+        let bildeBase64 = "";
 
-        // Datatabell basert på kvalifisert gjetting og Sintef-rapporter
+        // REELLE OPPDATERTE TALL FRA BILDET DITT
         const jordsmonnData = {
-            fjell:   { raatestart: 30, raatefaktor: 0.15 },
-            myr:     { raatestart: 15, raatefaktor: 0.40 },
-            asfalt:  { raatestart: 20, raatefaktor: 0.25 },
-            dyrka:   { raatestart: 12, raatefaktor: 0.50 }
+            fjell:   { raatestart: 30, raatefaktor: 0.20 },
+            asfalt:  { raatestart: 20, raatefaktor: 0.55 },
+            myr:     { raatestart: 15, raatefaktor: 0.45 },
+            dyrka:   { raatestart: 12, raatefaktor: 0.65 }
         };
 
-        // --- HENT LAGREDE DATA VED OPPSTART ---
         window.onload = () => {
             document.getElementById('netteier').value = localStorage.getItem('netteier') || '';
             document.getElementById('linjemast').value = localStorage.getItem('linjemast') || '';
+            document.getElementById('stolpeNr').value = localStorage.getItem('stolpeNr') || '';
         };
+
+        function handterBilde(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    bildeBase64 = e.target.result;
+                    document.getElementById('bildeVisning').src = bildeBase64;
+                    document.getElementById('bildeForhandsvisningSeksjon').classList.remove('hidden');
+                    document.getElementById('bildeTekst').innerText = "✅ Bilde er registrert!";
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
 
         function oppdaterAlder() {
             const montert = parseInt(document.getElementById('montertAar').value);
             const kontrollert = parseInt(document.getElementById('kontrollertAar').value);
-            
             if (montert && kontrollert) {
-                const alder = kontrollert - montert;
-                document.getElementById('alderVisning').innerText = `Aktiv alder ved kontroll: ${alder} år`;
+                document.getElementById('alderVisning').innerText = `Aktiv alder ved kontroll: ${kontrollert - montert} år`;
             }
         }
 
@@ -153,89 +191,77 @@
             }
         }
 
+        let sisteKalkulasjon = null;
+
         function beregnRestlevetid() {
-            // Lagre verdier til localStorage HVER GANG vi beregner
             localStorage.setItem('netteier', document.getElementById('netteier').value);
             localStorage.setItem('linjemast', document.getElementById('linjemast').value);
+            localStorage.setItem('stolpeNr', document.getElementById('stolpeNr').value);
 
+            const netteier = document.getElementById('netteier').value || 'Ukjent';
+            const linjemast = document.getElementById('linjemast').value || 'Ukjent';
+            const stolpeNr = document.getElementById('stolpeNr').value || 'Ukjent';
             const kontrollertAar = parseInt(document.getElementById('kontrollertAar').value) || new Date().getFullYear();
             const montertAar = parseInt(document.getElementById('montertAar').value);
-            const raatefaktor = parseFloat(document.getElementById('raatefaktor').value) || 0.40;
+            const raatefaktor = parseFloat(document.getElementById('raatefaktor').value) || 0.45;
             const utskiftingGrense = parseFloat(document.getElementById('utskiftingGrense').value) || 35;
             const maaltRestskall = parseFloat(document.getElementById('maaltRestskall').value);
-            const isReimpregnert = document.getElementById('reimpregnert').checked;
+            const isDryppet = document.getElementById('drypping').checked;
 
-            if (isNaN(maaltRestskall) || !maaltRestskall) {
-                alert("Vennligst tast inn målt restskall i millimeter før beregning.");
-                return;
-            }
-            if (isNaN(montertAar) || !montertAar) {
-                alert("Vennligst fyll ut årstallmerke for stolpen.");
+            if (isNaN(maaltRestskall) || !maaltRestskall || isNaN(montertAar) || !montertAar) {
+                alert("Vennligst fyll ut Monteringsår og Målt restskall.");
                 return;
             }
 
-            // --- BEREGNING ---
             const marginIgjenMm = maaltRestskall - utskiftingGrense;
-            let estimertRestlevetid = 0;
+            let estimertRestlevetid = marginIgjenMm <= 0 ? 0 : Math.round(marginIgjenMm / raatefaktor);
 
-            if (marginIgjenMm <= 0) {
-                estimertRestlevetid = 0;
-            } else {
-                estimertRestlevetid = Math.round(marginIgjenMm / raatefaktor);
-            }
-
-            if (isReimpregnert && marginIgjenMm > 0) {
-                estimertRestlevetid += 7;
+            if (isDryppet && marginIgjenMm > 0) {
+                estimertRestlevetid += 7; // Forlengelse med 6-8 år (snitt 7)
             }
 
             const anbefaltUtskiftetAar = kontrollertAar + estimertRestlevetid;
+            let nesteKontrollOmAar = estimertRestlevetid <= 5 ? 2 : (estimertRestlevetid <= 12 ? 5 : 10);
 
-            let nesteKontrollOmAar = 10;
-            if (estimertRestlevetid <= 5) nesteKontrollOmAar = 2;
-            else if (estimertRestlevetid <= 12) nesteKontrollOmAar = 5;
-            else if (isReimpregnert) nesteKontrollOmAar = 10;
+            // Lagre tilstanden globalt for eksport
+            sisteKalkulasjon = { netteier, linjemast, stolpeNr, montertAar, kontrollertAar, maaltRestskall, utskiftingGrense, estimertRestlevetid, anbefaltUtskiftetAar, jordsmonn: document.getElementById('jordsmonn').value };
 
-            const resSeksjon = document.getElementById('resultatSeksjon');
-            const resKort = document.getElementById('resultatKort');
-            
-            resSeksjon.classList.remove('hidden');
-
-            resKort.className = "p-6 rounded-xl border text-center space-y-4 shadow-inner ";
-            if (estimertRestlevetid === 0) {
-                resKort.classList.add("bg-red-100", "border-red-300", "text-red-950");
-                document.getElementById('resKonklusjonTekst').innerText = `Stolpen har nådd sikkerhetsgrensen på ${utskiftingGrense} mm.`;
-                document.getElementById('resNesteKontroll').innerText = "TILTAK: Må rødmerkes og skiftes ut snarest.";
-            } else if (estimertRestlevetid <= 8) {
-                resKort.classList.add("bg-amber-100", "border-amber-300", "text-amber-950");
-                document.getElementById('resKonklusjonTekst').innerText = `E.T. har beregnet begrenset margin før stolpen når ${utskiftingGrense} mm.`;
-                document.getElementById('resNesteKontroll').innerText = `TILTAK: Next obligatoriske kontroll om ${nesteKontrollOmAar} år (${kontrollertAar + nesteKontrollOmAar}).`;
-            } else {
-                resKort.classList.add("bg-green-100", "border-green-300", "text-green-950");
-                let tekst = `Stolpen har en godkjent sikkerhetsmargin.`;
-                if (isReimpregnert) tekst += ` Behandlingen har utsatt råteangrepet med ca. 7 år.`;
-                document.getElementById('resKonklusjonTekst').innerText = tekst;
-                document.getElementById('resNesteKontroll').innerText = `Neste planlagte kontrollperiode: Om ${nesteKontrollOmAar} år (${kontrollertAar + nesteKontrollOmAar}).`;
-            }
-
+            document.getElementById('resultatSeksjon').classList.remove('hidden');
             document.getElementById('resRestlevetid').innerText = `${estimertRestlevetid} år`;
             document.getElementById('resUtskiftingsAar').innerText = anbefaltUtskiftetAar;
+
+            const resKort = document.getElementById('resultatKort');
+            resKort.className = "p-6 rounded-xl border text-center space-y-4 shadow-inner ";
+
+            if (estimertRestlevetid === 0) {
+                resKort.classList.add("bg-red-100", "border-red-300", "text-red-950");
+                document.getElementById('resKonklusjonTekst').innerText = `Stolpe ${stolpeNr} har nådd sikkerhetsgrensen på ${utskiftingGrense} mm.`;
+                document.getElementById('resNesteKontroll').innerText = "TILTAK: Må rødmerkes og skiftes ut snarest.";
+            } else {
+                resKort.classList.add(estimertRestlevetid <= 8 ? "bg-amber-100" : "bg-green-100", "text-gray-900");
+                document.getElementById('resKonklusjonTekst').innerText = `Stolpe ${stolpeNr} har godkjent sikkerhetsmargin. ${isDryppet ? 'Drypping registrert (+7 år).' : ''}`;
+                document.getElementById('resNesteKontroll').innerText = `Neste kontrollperiode: Om ${nesteKontrollOmAar} år (${kontrollertAar + nesteKontrollOmAar}).`;
+            }
         }
 
-        // --- OFFLINE SERVICE WORKER ---
-        if ('serviceWorker' in navigator) {
-            const swCode = `
-                const CACHE_NAME = 'et-raatesjekk-v4';
-                self.addEventListener('install', e => {
-                    e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(['./', './index.html', './icon.png'])));
-                });
-                self.addEventListener('fetch', e => {
-                    e.respondWith(caches.match(e.request).then(response => response || fetch(e.request)));
-                });
-            `;
-            const blob = new Blob([swCode], { type: 'application/javascript' });
-            const workerUrl = URL.createObjectURL(blob);
-            navigator.serviceWorker.register(workerUrl).catch(err => console.log('E.T. SW feil:', err));
+        function lagreTilLokaltMinne() {
+            if (!sisteKalkulasjon) { alert("Beregn først!"); return; }
+            let historikk = JSON.parse(localStorage.getItem('et_historikk') || '[]');
+            historikk.push({...sisteKalkulasjon, bilde: bildeBase64 ? "Ja" : "Nei", dato: new Date().toLocaleDateString()});
+            localStorage.setItem('et_historikk', JSON.stringify(historikk));
+            alert("Målerapport lagret i lokalt minne på telefonen!");
         }
-    </script>
-</body>
-</html>
+
+        function eksporterTilExcel() {
+            let historikk = JSON.parse(localStorage.getItem('et_historikk') || '[]');
+            if (historikk.length === 0 && sisteKalkulasjon) { historikk.push(sisteKalkulasjon); }
+            if (historikk.length === 0) { alert("Ingen data å eksportere ennå."); return; }
+
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+            csvContent += "Dato;Netteier;Mastepunkt;StolpeNr;Montert;Kontrollert;Jordsmonn;MaaltRestskall;Grense;Restlevetid_Aar;Utskiftingsaar;HarBilde\r\n";
+
+            historikk.forEach(h => {
+                csvContent += `${h.dato||''};${h.netteier};${h.linjemast};${h.stolpeNr};${h.montertAar};${h.kontrollertAar};${h.jordsmonn};${h.maaltRestskall};${h.utskiftingGrense};${h.estimertRestlevetid};${h.anbefaltUtskiftetAar};${h.bilde||'Nei'}\r\n`;
+            });
+
+            const encoded
