@@ -151,6 +151,15 @@
             const utskiftingGrense = parseFloat(document.getElementById('utskiftingGrense').value) || 35;
             const maaltRestskall = parseFloat(document.getElementById('maaltRestskall').value);
             const isReimpregnert = document.getElementById('reimpregnert').checked;
+            // Lagre verdier til localStorage
+localStorage.setItem('netteier', document.getElementById('netteier').value);
+localStorage.setItem('linjemast', document.getElementById('linjemast').value);
+
+// Hent dem ved oppstart (legg inn i <script> på bunnen)
+window.onload = () => {
+    document.getElementById('netteier').value = localStorage.getItem('netteier') || '';
+    document.getElementById('linjemast').value = localStorage.getItem('linjemast') || '';
+};
 
             if (isNaN(maaltRestskall) || !maaltRestskall) {
                 alert("Vennligst tast inn målt restskall i millimeter før beregning.");
