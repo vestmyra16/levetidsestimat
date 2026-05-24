@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E.T. – Råtesjekk v8</title>
-    <link rel="icon" type="image/png" href="icon.png">
+    <title>E.T. – Råtesjekk v9</title>
+    <link class="hidden" rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="manifest" href="manifest.json">
@@ -33,7 +33,7 @@
                             <input type="text" id="linjemast" placeholder="Mastepunkt nr." class="w-full p-2 border rounded bg-white text-sm">
                         </div>
                         <div>
-                            <label class="block text-[11px] font-medium text-gray-600 mb-0.5">Stolpe nr. (Spesifiser stolpe i punktet)</label>
+                            <label class="block text-[11px] font-medium text-gray-600 mb-0.5">Stolpe nr.</label>
                             <input type="text" id="stolpeNr" placeholder="Eks. Stolpe 2 / Midtre" class="w-full p-2 border rounded bg-white text-sm">
                         </div>
                     </div>
@@ -56,22 +56,22 @@
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-[11px] font-medium text-gray-600 mb-0.5">Klimasone (Bestemmer råtestart)</label>
+                            <label class="block text-[11px] font-medium text-gray-600 mb-0.5">Klimasone</label>
                             <select id="klimasone" class="w-full p-2.5 border rounded bg-white text-sm font-medium">
                                 <option value="">-- Velg klimasone --</option>
-                                <option value="kyst">Kystsone / Innmark (0 - 50 moh / Råtestart: 10 år)</option>
-                                <option value="skog">Skog / Innlandssone (50 - 300 moh / Råtestart: 20 år)</option>
-                                <option value="fjell">Fjellsone (Over 300 moh / Råtestart: 30 år)</option>
+                                <option value="kyst">Kystsone / Innmark (0 - 50 moh)</option>
+                                <option value="skog">Skog / Innlandssone (50 - 300 moh)</option>
+                                <option value="fjell">Fjellsone (Over 300 moh)</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[11px] font-medium text-gray-600 mb-0.5">Jordsmonn (Bestemmer råtefaktor)</label>
+                            <label class="block text-[11px] font-medium text-gray-600 mb-0.5">Jordsmonn</label>
                             <select id="jordsmonn" class="w-full p-2.5 border rounded bg-white text-sm font-medium">
                                 <option value="">-- Velg jordsmonn --</option>
-                                <option value="fjell">Fjellfundament (0.20 mm/år)</option>
-                                <option value="myr">Myr / morene / skogsmark (0.45 mm/år)</option>
-                                <option value="asfalt">Asfalt / betong (0.55 mm/år)</option>
-                                <option value="dyrka">Dyrka mark (0.65 mm/år)</option>
+                                <option value="fjell">Fjellfundament</option>
+                                <option value="myr">Myr / morene / skogsmark</option>
+                                <option value="asfalt">Asfalt / betong</option>
+                                <option value="dyrka">Dyrka mark</option>
                             </select>
                         </div>
                     </div>
@@ -155,7 +155,7 @@
     <script>
         let bildeBase64 = "";
 
-        // REELLE TALL BASERT PÅ DIN NYE METODE
+        // TALLENE LIGGER TRYGGT FORVART INNE I JAVASCRIPT-MOTOREN (SKJULT FRA MENYEN)
         const soneStartData = { kyst: 10, skog: 20, fjell: 30 };
         const jordsmonnFaktorData = { fjell: 0.20, myr: 0.45, asfalt: 0.55, dyrka: 0.65 };
 
@@ -209,7 +209,6 @@
                 return;
             }
 
-            // HENT REELLE SONE- OG JORDSMONNSTALL
             const raatestartAlder = soneStartData[valgtSone];
             const raatefaktor = jordsmonnFaktorData[valgtJord];
 
@@ -219,18 +218,17 @@
             if (marginIgjenMm <= 0) {
                 estimertRestlevetid = 0;
             } else {
-                // Avansert og sikrere sjekk basert på din modell
                 estimertRestlevetid = Math.round(marginIgjenMm / raatefaktor);
             }
 
             if (isDryppet && marginIgjenMm > 0) {
-                estimertRestlevetid += 7; // Forlengelse med 6-8 år (gjennomsnitt 7 år)
+                estimertRestlevetid += 7;
             }
 
             const anbefaltUtskiftetAar = kontrollertAar + estimertRestlevetid;
             let nesteKontrollOmAar = estimertRestlevetid <= 5 ? 2 : (estimertRestlevetid <= 12 ? 5 : 10);
 
-            sisteKalkulasjon = { netteier, linjemast, stolpeNr, montertAar, kontrollertAar, klimasone: valgtSone, jordsmonn: valgtJord, maaltRestskall, utskiftingGrense, estimertRestlevetid, anbefaltUtskiftetAar, jordsmonn: valgtJord };
+            sisteKalkulasjon = { netteier, linjemast, stolpeNr, montertAar, kontrollertAar, klimasone: valgtSone, jordsmonn: valgtJord, maaltRestskall, utskiftingGrense, estimertRestlevetid, anbefaltUtskiftetAar };
 
             document.getElementById('resultatSeksjon').classList.remove('hidden');
             document.getElementById('resRestlevetid').innerText = `${estimertRestlevetid} år`;
@@ -245,7 +243,7 @@
                 document.getElementById('resNesteKontroll').innerText = "TILTAK: Må rødmerkes og skiftes ut snarest.";
             } else {
                 resKort.classList.add(estimertRestlevetid <= 8 ? "bg-amber-100" : "bg-green-100", "text-gray-900");
-                document.getElementById('resKonklusjonTekst').innerText = `Stolpe ${stolpeNr} har en godkjent sikkerhetsmargin ut fra valgt klimasone og jordsmonn. ${isDryppet ? 'Tilstrekkelig drypping registrert (+7 år).' : ''}`;
+                document.getElementById('resKonklusjonTekst').innerText = `Stolpe ${stolpeNr} har en godkjent sikkerhetsmargin. ${isDryppet ? 'Drypping registrert (+7 år).' : ''}`;
                 document.getElementById('resNesteKontroll').innerText = `Neste obligatoriske kontroll: Om ${nesteKontrollOmAar} år (${kontrollertAar + nesteKontrollOmAar}).`;
             }
         }
@@ -273,7 +271,7 @@
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `ET_Malerapport_SoneSjekk_${new Date().toLocaleDateString()}.csv`);
+            link.setAttribute("download", `ET_Malerapport_${new Date().toLocaleDateString()}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -281,7 +279,7 @@
 
         if ('serviceWorker' in navigator) {
             const swCode = `
-                const CACHE_NAME = 'et-raatesjekk-v8';
+                const CACHE_NAME = 'et-raatesjekk-v9';
                 self.addEventListener('install', e => {
                     e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(['./', './index.html', './icon.png'])));
                 });
