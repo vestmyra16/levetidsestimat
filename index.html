@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E.T. – Råtesjekk v9</title>
-    <link class="hidden" rel="icon" type="image/png" href="icon.png">
+    <title>E.T. – Råtesjekk v10</title>
+    <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="manifest" href="manifest.json">
@@ -21,20 +21,26 @@
         <main class="bg-white p-6 rounded-b-xl shadow-md border-x border-b border-gray-200 space-y-6 overflow-hidden">
             
             <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 border-b pb-1">1. Stamdata & Lokasjon</h2>
+                <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 border-b pb-1">1. Grunnlagsdata fra Stolpekontroll</h2>
                 <div class="space-y-3">
-                    <div>
-                        <label class="block text-[11px] font-medium text-gray-600 mb-0.5">Netteier / Kontrollør</label>
-                        <input type="text" id="netteier" placeholder="Eks. Elvia" class="w-full p-2 border rounded bg-white text-sm">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-medium text-gray-600 mb-0.5">Netteier / Kontrollør</label>
+                            <input type="text" id="netteier" placeholder="Eks. Elvia" class="w-full p-2 border rounded bg-white text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-medium text-gray-600 mb-0.5">LinjeID</label>
+                            <input type="text" id="linjeId" placeholder="Eks. L0042" class="w-full p-2 border rounded bg-white text-sm">
+                        </div>
                     </div>
                     <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-[11px] font-medium text-gray-600 mb-0.5">Linje / Mast nr.</label>
-                            <input type="text" id="linjemast" placeholder="Mastepunkt nr." class="w-full p-2 border rounded bg-white text-sm">
+                            <label class="block text-[11px] font-medium text-gray-600 mb-0.5">Mastepunkt nr.</label>
+                            <input type="text" id="mastepunktNr" placeholder="Eks. Mast 14" class="w-full p-2 border rounded bg-white text-sm">
                         </div>
                         <div>
                             <label class="block text-[11px] font-medium text-gray-600 mb-0.5">Stolpe nr.</label>
-                            <input type="text" id="stolpeNr" placeholder="Eks. Stolpe 2 / Midtre" class="w-full p-2 border rounded bg-white text-sm">
+                            <input type="text" id="stolpeNr" placeholder="Eks. Stolpe 3 / B-bein" class="w-full p-2 border rounded bg-white text-sm">
                         </div>
                     </div>
                 </div>
@@ -155,14 +161,15 @@
     <script>
         let bildeBase64 = "";
 
-        // TALLENE LIGGER TRYGGT FORVART INNE I JAVASCRIPT-MOTOREN (SKJULT FRA MENYEN)
         const soneStartData = { kyst: 10, skog: 20, fjell: 30 };
         const jordsmonnFaktorData = { fjell: 0.20, myr: 0.45, asfalt: 0.55, dyrka: 0.65 };
 
         window.onload = () => {
             document.getElementById('netteier').value = localStorage.getItem('netteier') || '';
-            document.getElementById('linjemast').value = localStorage.getItem('linjemast') || '';
+            document.getElementById('linjeId').value = localStorage.getItem('linjeId') || '';
+            document.getElementById('mastepunktNr').value = localStorage.getItem('mastepunktNr') || '';
             document.getElementById('stolpeNr').value = localStorage.getItem('stolpeNr') || '';
+            document.getElementById('kontrollertAar').value = new Date().getFullYear();
         };
 
         function handterBilde(input) {
@@ -190,12 +197,15 @@
 
         function beregnRestlevetid() {
             localStorage.setItem('netteier', document.getElementById('netteier').value);
-            localStorage.setItem('linjemast', document.getElementById('linjemast').value);
+            localStorage.setItem('linjeId', document.getElementById('linjeId').value);
+            localStorage.setItem('mastepunktNr', document.getElementById('mastepunktNr').value);
             localStorage.setItem('stolpeNr', document.getElementById('stolpeNr').value);
 
             const netteier = document.getElementById('netteier').value || 'Ukjent';
-            const linjemast = document.getElementById('linjemast').value || 'Ukjent';
+            const linjeId = document.getElementById('linjeId').value || 'Ukjent';
+            const mastepunktNr = document.getElementById('mastepunktNr').value || 'Ukjent';
             const stolpeNr = document.getElementById('stolpeNr').value || 'Ukjent';
+            
             const montertAar = parseInt(document.getElementById('montertAar').value);
             const kontrollertAar = parseInt(document.getElementById('kontrollertAar').value) || new Date().getFullYear();
             const valgtSone = document.getElementById('klimasone').value;
@@ -209,15 +219,11 @@
                 return;
             }
 
-            const raatestartAlder = soneStartData[valgtSone];
             const raatefaktor = jordsmonnFaktorData[valgtJord];
-
             const marginIgjenMm = maaltRestskall - utskiftingGrense;
             let estimertRestlevetid = 0;
 
-            if (marginIgjenMm <= 0) {
-                estimertRestlevetid = 0;
-            } else {
+            if (marginIgjenMm > 0) {
                 estimertRestlevetid = Math.round(marginIgjenMm / raatefaktor);
             }
 
@@ -228,7 +234,7 @@
             const anbefaltUtskiftetAar = kontrollertAar + estimertRestlevetid;
             let nesteKontrollOmAar = estimertRestlevetid <= 5 ? 2 : (estimertRestlevetid <= 12 ? 5 : 10);
 
-            sisteKalkulasjon = { netteier, linjemast, stolpeNr, montertAar, kontrollertAar, klimasone: valgtSone, jordsmonn: valgtJord, maaltRestskall, utskiftingGrense, estimertRestlevetid, anbefaltUtskiftetAar };
+            sisteKalkulasjon = { netteier, linjeId, mastepunktNr, stolpeNr, montertAar, kontrollertAar, klimasone: valgtSone, jordsmonn: valgtJord, maaltRestskall, utskiftingGrense, estimertRestlevetid, anbefaltUtskiftetAar };
 
             document.getElementById('resultatSeksjon').classList.remove('hidden');
             document.getElementById('resRestlevetid').innerText = `${estimertRestlevetid} år`;
@@ -239,7 +245,7 @@
 
             if (estimertRestlevetid === 0) {
                 resKort.classList.add("bg-red-100", "border-red-300", "text-red-950");
-                document.getElementById('resKonklusjonTekst').innerText = `Stolpe ${stolpeNr} i mastepunkt ${linjemast} har nådd sikkerhetsgrensen på ${utskiftingGrense} mm.`;
+                document.getElementById('resKonklusjonTekst').innerText = `Stolpe ${stolpeNr} på mastepunkt ${mastepunktNr} (Linje ${linjeId}) har nådd sikkerhetsgrensen.`;
                 document.getElementById('resNesteKontroll').innerText = "TILTAK: Må rødmerkes og skiftes ut snarest.";
             } else {
                 resKort.classList.add(estimertRestlevetid <= 8 ? "bg-amber-100" : "bg-green-100", "text-gray-900");
@@ -262,16 +268,16 @@
             if (historikk.length === 0) { alert("Ingen data å eksportere ennå."); return; }
 
             let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
-            csvContent += "Dato;Netteier;Mastepunkt;StolpeNr;Montert;Kontrollert;Klimasone;Jordsmonn;MaaltRestskall;Grense;Restlevetid_Aar;Utskiftingsaar;HarBilde\r\n";
+            csvContent += "Dato;Netteier;LinjeID;MastepunktNr;StolpeNr;Montert;Kontrollert;Klimasone;Jordsmonn;MaaltRestskall;Grense;Restlevetid_Aar;Utskiftingsaar;HarBilde\r\n";
 
             historikk.forEach(h => {
-                csvContent += `${h.dato||''};${h.netteier};${h.linjemast};${h.stolpeNr};${h.montertAar};${h.kontrollertAar};${h.klimasone};${h.jordsmonn};${h.maaltRestskall};${h.utskiftingGrense};${h.estimertRestlevetid};${h.anbefaltUtskiftetAar};${h.bilde||'Nei'}\r\n`;
+                csvContent += `${h.dato||''};${h.netteier};${h.linjeId};${h.mastepunktNr};${h.stolpeNr};${h.montertAar};${h.kontrollertAar};${h.klimasone};${h.jordsmonn};${h.maaltRestskall};${h.utskiftingGrense};${h.estimertRestlevetid};${h.anbefaltUtskiftetAar};${h.bilde||'Nei'}\r\n`;
             });
 
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `ET_Malerapport_${new Date().toLocaleDateString()}.csv`);
+            link.setAttribute("download", `ET_Malerapport_Eksport_${new Date().toLocaleDateString()}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -279,7 +285,7 @@
 
         if ('serviceWorker' in navigator) {
             const swCode = `
-                const CACHE_NAME = 'et-raatesjekk-v9';
+                const CACHE_NAME = 'et-raatesjekk-v10';
                 self.addEventListener('install', e => {
                     e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(['./', './index.html', './icon.png'])));
                 });
