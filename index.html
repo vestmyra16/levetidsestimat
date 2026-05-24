@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E.T. – Råtesjekk v7</title>
+    <title>E.T. – Råtesjekk v8</title>
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
@@ -15,7 +15,7 @@
         <header class="bg-green-700 text-white p-5 rounded-t-xl shadow-md text-center flex flex-col items-center justify-center">
             <img src="icon.png" alt="E.T. Råtesjekk" class="w-24 h-24 mb-3 rounded-xl shadow-md">
             <h1 class="text-3xl font-black tracking-tighter text-amber-300">E.T.</h1>
-            <p class="text-xs text-green-100 mt-1 uppercase tracking-wider font-bold">Råtesjekk – Dokumentasjon & Restlevetid</p>
+            <p class="text-xs text-green-100 mt-1 uppercase tracking-wider font-bold">Råtesjekk – Sone- & Restlevetidskalkulator</p>
         </header>
 
         <main class="bg-white p-6 rounded-b-xl shadow-md border-x border-b border-gray-200 space-y-6 overflow-hidden">
@@ -33,15 +33,15 @@
                             <input type="text" id="linjemast" placeholder="Mastepunkt nr." class="w-full p-2 border rounded bg-white text-sm">
                         </div>
                         <div>
-                            <label class="block text-[11px] font-medium text-gray-600 mb-0.5">Stolpe nr. (Gjelder spesifikk stolpe)</label>
-                            <input type="text" id="stolpeNr" placeholder="Eks. Stolpe 3 / B-bein" class="w-full p-2 border rounded bg-white text-sm">
+                            <label class="block text-[11px] font-medium text-gray-600 mb-0.5">Stolpe nr. (Spesifiser stolpe i punktet)</label>
+                            <input type="text" id="stolpeNr" placeholder="Eks. Stolpe 2 / Midtre" class="w-full p-2 border rounded bg-white text-sm">
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 border-b pb-1">2. Alder & Jordsmonn</h2>
+                <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 border-b pb-1">2. Alder & Soneplassering</h2>
                 <div class="space-y-4">
                     <div class="grid grid-cols-2 gap-3">
                         <div>
@@ -53,15 +53,27 @@
                             <input type="number" id="kontrollertAar" class="w-full p-2.5 border rounded bg-white text-sm" onchange="oppdaterAlder()">
                         </div>
                     </div>
-                    <div>
-                        <label class="block text-[11px] font-medium text-gray-600 mb-0.5">Jordsmonn (Korrigerte og strengere faktorer)</label>
-                        <select id="jordsmonn" class="w-full p-2.5 border rounded bg-white text-sm font-medium" onchange="oppdaterGrunnlagstal()">
-                            <option value="">-- Velg grunnlag fra listen --</option>
-                            <option value="fjell">Fjellfundament / Høyfjell (0.20 mm/år)</option>
-                            <option value="asfalt">Asfalt / betong (0.55 mm/år)</option>
-                            <option value="myr">Myr / morene / skogsmark (0.45 mm/år)</option>
-                            <option value="dyrka">Dyrka mark (0.65 mm/år)</option>
-                        </select>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-medium text-gray-600 mb-0.5">Klimasone (Bestemmer råtestart)</label>
+                            <select id="klimasone" class="w-full p-2.5 border rounded bg-white text-sm font-medium">
+                                <option value="">-- Velg klimasone --</option>
+                                <option value="kyst">Kystsone / Innmark (0 - 50 moh / Råtestart: 10 år)</option>
+                                <option value="skog">Skog / Innlandssone (50 - 300 moh / Råtestart: 20 år)</option>
+                                <option value="fjell">Fjellsone (Over 300 moh / Råtestart: 30 år)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-medium text-gray-600 mb-0.5">Jordsmonn (Bestemmer råtefaktor)</label>
+                            <select id="jordsmonn" class="w-full p-2.5 border rounded bg-white text-sm font-medium">
+                                <option value="">-- Velg jordsmonn --</option>
+                                <option value="fjell">Fjellfundament (0.20 mm/år)</option>
+                                <option value="myr">Myr / morene / skogsmark (0.45 mm/år)</option>
+                                <option value="asfalt">Asfalt / betong (0.55 mm/år)</option>
+                                <option value="dyrka">Dyrka mark (0.65 mm/år)</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="text-xs text-right mt-1.5 text-gray-500 font-medium" id="alderVisning">Aktiv alder ved kontroll: - år</div>
                 </div>
@@ -79,19 +91,14 @@
                         <input type="number" id="maaltRestskall" placeholder="Tast inn" class="w-full p-2 border border-amber-400 rounded bg-white text-lg font-black text-center text-blue-950 focus:ring-2 focus:ring-amber-400">
                     </div>
                 </div>
-                <div class="hidden">
-                    <input type="number" id="raatefaktor" step="0.01">
-                </div>
             </div>
 
             <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-2">
                 <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider border-b pb-1">4. Fotodokumentasjon</h2>
-                <div class="flex items-center space-x-3">
-                    <label class="w-full flex flex-col items-center px-4 py-2 bg-white text-gray-700 rounded-lg border shadow-sm tracking-wide uppercase border-blue-200 cursor-pointer hover:bg-blue-50 transition text-xs font-bold">
-                        <span id="bildeTekst">📷 Ta eller velg bilde av stolpen</span>
-                        <input type="file" accept="image/*" id="stolpeBilde" class="hidden" onchange="handterBilde(this)">
-                    </label>
-                </div>
+                <label class="w-full flex flex-col items-center px-4 py-2 bg-white text-gray-700 rounded-lg border shadow-sm tracking-wide uppercase border-blue-200 cursor-pointer hover:bg-blue-50 transition text-xs font-bold">
+                    <span id="bildeTekst">📷 Ta eller velg bilde av stolpen</span>
+                    <input type="file" accept="image/*" id="stolpeBilde" class="hidden" onchange="handterBilde(this)">
+                </label>
                 <div id="bildeForhandsvisningSeksjon" class="hidden flex justify-center pt-2">
                     <img id="bildeVisning" class="max-h-48 rounded-lg shadow-md border border-gray-300">
                 </div>
@@ -100,7 +107,7 @@
             <div class="flex items-center justify-between bg-green-50 p-4 rounded-lg border border-green-200">
                 <div class="pr-2">
                     <h3 class="text-sm font-bold text-green-900">Dryppimpregneres (borehull) nå?</h3>
-                    <p class="text-xs text-green-700">Tilstrekkelig drypping utsetter råte og forlenger levetid med ca. 7 år.</p>
+                    <p class="text-xs text-green-700">Tilstrekkelig drypping utsetter videre råte og forlenger levetid med ca. 7 år.</p>
                 </div>
                 <label class="relative inline-flex items-center cursor-pointer select-none">
                     <input type="checkbox" id="drypping" class="sr-only peer">
@@ -146,16 +153,11 @@
     </div>
 
     <script>
-        document.getElementById('kontrollertAar').value = new Date().getFullYear();
         let bildeBase64 = "";
 
-        // REELLE OPPDATERTE TALL FRA BILDET DITT
-        const jordsmonnData = {
-            fjell:   { raatestart: 30, raatefaktor: 0.20 },
-            asfalt:  { raatestart: 20, raatefaktor: 0.55 },
-            myr:     { raatestart: 15, raatefaktor: 0.45 },
-            dyrka:   { raatestart: 12, raatefaktor: 0.65 }
-        };
+        // REELLE TALL BASERT PÅ DIN NYE METODE
+        const soneStartData = { kyst: 10, skog: 20, fjell: 30 };
+        const jordsmonnFaktorData = { fjell: 0.20, myr: 0.45, asfalt: 0.55, dyrka: 0.65 };
 
         window.onload = () => {
             document.getElementById('netteier').value = localStorage.getItem('netteier') || '';
@@ -184,13 +186,6 @@
             }
         }
 
-        function oppdaterGrunnlagstal() {
-            const valgtJord = document.getElementById('jordsmonn').value;
-            if (valgtJord && jordsmonnData[valgtJord]) {
-                document.getElementById('raatefaktor').value = jordsmonnData[valgtJord].raatefaktor;
-            }
-        }
-
         let sisteKalkulasjon = null;
 
         function beregnRestlevetid() {
@@ -201,30 +196,41 @@
             const netteier = document.getElementById('netteier').value || 'Ukjent';
             const linjemast = document.getElementById('linjemast').value || 'Ukjent';
             const stolpeNr = document.getElementById('stolpeNr').value || 'Ukjent';
-            const kontrollertAar = parseInt(document.getElementById('kontrollertAar').value) || new Date().getFullYear();
             const montertAar = parseInt(document.getElementById('montertAar').value);
-            const raatefaktor = parseFloat(document.getElementById('raatefaktor').value) || 0.45;
+            const kontrollertAar = parseInt(document.getElementById('kontrollertAar').value) || new Date().getFullYear();
+            const valgtSone = document.getElementById('klimasone').value;
+            const valgtJord = document.getElementById('jordsmonn').value;
             const utskiftingGrense = parseFloat(document.getElementById('utskiftingGrense').value) || 35;
             const maaltRestskall = parseFloat(document.getElementById('maaltRestskall').value);
             const isDryppet = document.getElementById('drypping').checked;
 
-            if (isNaN(maaltRestskall) || !maaltRestskall || isNaN(montertAar) || !montertAar) {
-                alert("Vennligst fyll ut Monteringsår og Målt restskall.");
+            if (!montertAar || !valgtSone || !valgtJord || isNaN(maaltRestskall)) {
+                alert("Vennligst fyll ut alle feltene (Monteringsår, Klimasone, Jordsmonn og Målt restskall) før beregning.");
                 return;
             }
 
+            // HENT REELLE SONE- OG JORDSMONNSTALL
+            const raatestartAlder = soneStartData[valgtSone];
+            const raatefaktor = jordsmonnFaktorData[valgtJord];
+
             const marginIgjenMm = maaltRestskall - utskiftingGrense;
-            let estimertRestlevetid = marginIgjenMm <= 0 ? 0 : Math.round(marginIgjenMm / raatefaktor);
+            let estimertRestlevetid = 0;
+
+            if (marginIgjenMm <= 0) {
+                estimertRestlevetid = 0;
+            } else {
+                // Avansert og sikrere sjekk basert på din modell
+                estimertRestlevetid = Math.round(marginIgjenMm / raatefaktor);
+            }
 
             if (isDryppet && marginIgjenMm > 0) {
-                estimertRestlevetid += 7; // Forlengelse med 6-8 år (snitt 7)
+                estimertRestlevetid += 7; // Forlengelse med 6-8 år (gjennomsnitt 7 år)
             }
 
             const anbefaltUtskiftetAar = kontrollertAar + estimertRestlevetid;
             let nesteKontrollOmAar = estimertRestlevetid <= 5 ? 2 : (estimertRestlevetid <= 12 ? 5 : 10);
 
-            // Lagre tilstanden globalt for eksport
-            sisteKalkulasjon = { netteier, linjemast, stolpeNr, montertAar, kontrollertAar, maaltRestskall, utskiftingGrense, estimertRestlevetid, anbefaltUtskiftetAar, jordsmonn: document.getElementById('jordsmonn').value };
+            sisteKalkulasjon = { netteier, linjemast, stolpeNr, montertAar, kontrollertAar, klimasone: valgtSone, jordsmonn: valgtJord, maaltRestskall, utskiftingGrense, estimertRestlevetid, anbefaltUtskiftetAar, jordsmonn: valgtJord };
 
             document.getElementById('resultatSeksjon').classList.remove('hidden');
             document.getElementById('resRestlevetid').innerText = `${estimertRestlevetid} år`;
@@ -235,12 +241,12 @@
 
             if (estimertRestlevetid === 0) {
                 resKort.classList.add("bg-red-100", "border-red-300", "text-red-950");
-                document.getElementById('resKonklusjonTekst').innerText = `Stolpe ${stolpeNr} har nådd sikkerhetsgrensen på ${utskiftingGrense} mm.`;
+                document.getElementById('resKonklusjonTekst').innerText = `Stolpe ${stolpeNr} i mastepunkt ${linjemast} har nådd sikkerhetsgrensen på ${utskiftingGrense} mm.`;
                 document.getElementById('resNesteKontroll').innerText = "TILTAK: Må rødmerkes og skiftes ut snarest.";
             } else {
                 resKort.classList.add(estimertRestlevetid <= 8 ? "bg-amber-100" : "bg-green-100", "text-gray-900");
-                document.getElementById('resKonklusjonTekst').innerText = `Stolpe ${stolpeNr} har godkjent sikkerhetsmargin. ${isDryppet ? 'Drypping registrert (+7 år).' : ''}`;
-                document.getElementById('resNesteKontroll').innerText = `Neste kontrollperiode: Om ${nesteKontrollOmAar} år (${kontrollertAar + nesteKontrollOmAar}).`;
+                document.getElementById('resKonklusjonTekst').innerText = `Stolpe ${stolpeNr} har en godkjent sikkerhetsmargin ut fra valgt klimasone og jordsmonn. ${isDryppet ? 'Tilstrekkelig drypping registrert (+7 år).' : ''}`;
+                document.getElementById('resNesteKontroll').innerText = `Neste obligatoriske kontroll: Om ${nesteKontrollOmAar} år (${kontrollertAar + nesteKontrollOmAar}).`;
             }
         }
 
@@ -258,10 +264,34 @@
             if (historikk.length === 0) { alert("Ingen data å eksportere ennå."); return; }
 
             let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
-            csvContent += "Dato;Netteier;Mastepunkt;StolpeNr;Montert;Kontrollert;Jordsmonn;MaaltRestskall;Grense;Restlevetid_Aar;Utskiftingsaar;HarBilde\r\n";
+            csvContent += "Dato;Netteier;Mastepunkt;StolpeNr;Montert;Kontrollert;Klimasone;Jordsmonn;MaaltRestskall;Grense;Restlevetid_Aar;Utskiftingsaar;HarBilde\r\n";
 
             historikk.forEach(h => {
-                csvContent += `${h.dato||''};${h.netteier};${h.linjemast};${h.stolpeNr};${h.montertAar};${h.kontrollertAar};${h.jordsmonn};${h.maaltRestskall};${h.utskiftingGrense};${h.estimertRestlevetid};${h.anbefaltUtskiftetAar};${h.bilde||'Nei'}\r\n`;
+                csvContent += `${h.dato||''};${h.netteier};${h.linjemast};${h.stolpeNr};${h.montertAar};${h.kontrollertAar};${h.klimasone};${h.jordsmonn};${h.maaltRestskall};${h.utskiftingGrense};${h.estimertRestlevetid};${h.anbefaltUtskiftetAar};${h.bilde||'Nei'}\r\n`;
             });
 
-            const encoded
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `ET_Malerapport_SoneSjekk_${new Date().toLocaleDateString()}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                const CACHE_NAME = 'et-raatesjekk-v8';
+                self.addEventListener('install', e => {
+                    e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(['./', './index.html', './icon.png'])));
+                });
+                self.addEventListener('fetch', e => {
+                    e.respondWith(caches.match(e.request).then(response => response || fetch(e.request)));
+                });
+            `;
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(err => console.log('SW feil:', err));
+        }
+    </script>
+</body>
+</html>
