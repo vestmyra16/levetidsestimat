@@ -4,20 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>E.T. – Råtesjekk v12</title>
-    
-    <meta name="author" content="E.T. og Sprekkanalyse - Opphavsrett 2026">
-    
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="manifest" href="manifest.json">
-
-    <style>
-        body {
-            -webkit-user-select: none;
-            user-select: none;
-        }
-    </style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans min-h-screen">
 
@@ -177,28 +167,6 @@
     </div>
 
     <script>
-        // 🔒 START SIKKERHETSLÅS
-        document.addEventListener("DOMContentLoaded", () => {
-            // Sperr for høyreklikk
-            document.addEventListener('contextmenu', event => event.preventDefault());
-
-            // Domenelås
-            const gyldigDomene = "vestmyra16.github.io";
-            if (window.location.hostname !== "" && window.location.hostname !== gyldigDomene) {
-                document.body.innerHTML = ""; 
-                return; 
-            }
-
-            // Utløpsdato
-            const utlopsDato = new Date("2026-07-13");
-            if (new Date() > utlopsDato) {
-                alert("Testperioden er utløpt.");
-                window.location.href = "about:blank";
-                return;
-            }
-        });
-        // 🔒 SLUTT SIKKERHETSLÅS
-
         let bildeBase64 = "";
         const soneStartData = { kyst: 10, skog: 20, fjell: 30 };
         const jordsmonnFaktorData = { fjell: 0.20, jord_pa_fjell: 0.45, myr: 0.45, asfalt: 0.55, dyrka: 0.65 };
@@ -243,4 +211,125 @@
             const netteier = document.getElementById('netteier').value || 'Ukjent';
             const linjeId = document.getElementById('linjeId').value || 'Ukjent';
             const mastepunktNr = document.getElementById('mastepunktNr').value || 'Ukjent';
-            const stol
+            const stolpeNr = document.getElementById('stolpeNr').value || 'Ukjent';
+            
+            const montertAar = parseInt(document.getElementById('montertAar').value);
+            const kontrollertAar = parseInt(document.getElementById('kontrollertAar').value) || new Date().getFullYear();
+            const valgtSone = document.getElementById('klimasone').value;
+            const valgtJord = document.getElementById('jordsmonn').value;
+            const utskiftingGrense = parseFloat(document.getElementById('utskiftingGrense').value) || 35;
+            const maaltRestskall = parseFloat(document.getElementById('maaltRestskall').value);
+            const isDryppet = document.getElementById('drypping').checked;
+
+            if (!montertAar || !valgtSone || !valgtJord || isNaN(maaltRestskall)) {
+                alert("Vennligst fyll ut alle feltene (Monteringsår, Klimasone, Jordsmonn og Målt restskall) før beregning.");
+                return;
+            }
+
+            const raatefaktor = jordsmonnFaktorData[valgtJord];
+            const marginIgjenMm = maaltRestskall - utskiftingGrense;
+            let estimertRestlevetid = 0;
+
+            if (marginIgjenMm > 0) {
+                estimertRestlevetid = Math.round(marginIgjenMm / raatefaktor);
+            }
+
+            if (isDryppet && marginIgjenMm > 0) {
+                estimertRestlevetid += 7;
+            }
+
+            const anbefaltUtskiftetAar = kontrollertAar + estimertRestlevetid;
+            let nesteKontrollOmAar = estimertRestlevetid <= 5 ? 2 : (estimertRestlevetid <= 12 ? 5 : 10);
+
+            sisteKalkulasjon = { netteier, linjeId, mastepunktNr, stolpeNr, montertAar, kontrollertAar, klimasone: valgtSone, jordsmonn: valgtJord, maaltRestskall, utskiftingGrense, estimertRestlevetid, anbefaltUtskiftetAar };
+
+            document.getElementById('resultatSeksjon').classList.remove('hidden');
+            document.getElementById('resRestlevetid').innerText = `${estimertRestlevetid} år`;
+            document.getElementById('resUtskiftingsAar').innerText = anbefaltUtskiftetAar;
+
+            const resKort = document.getElementById('resultatKort');
+            resKort.className = "p-6 rounded-xl border text-center space-y-4 shadow-inner ";
+
+            if (estimertRestlevetid === 0) {
+                resKort.classList.add("bg-red-100", "border-red-300", "text-red-950");
+                document.getElementById('resKonklusjonTekst').innerText = `Stolpe ${stolpeNr} på mastepunkt ${mastepunktNr} (Linje ${linjeId}) har nådd sikkerhetsgrensen.`;
+                document.getElementById('resNesteKontroll').innerText = "TILTAK: Må rødmerkes og skiftes ut snarest på grunn av klatresikkerhet.";
+            } else {
+                resKort.classList.add(estimertRestlevetid <= 8 ? "bg-amber-100" : "bg-green-100", "text-gray-900");
+                document.getElementById('resKonklusjonTekst').innerText = `Stolpe ${stolpeNr} har en godkjent sikkerhetsmargin ut fra gjeldende utskiftingsgrense. ${isDryppet ? 'Drypping registrert (+7 år).' : ''}`;
+                document.getElementById('resNesteKontroll').innerText = `Neste obligatoriske kontroll: Om ${nesteKontrollOmAar} år (${kontrollertAar + nesteKontrollOmAar}).`;
+            }
+        }
+
+        function lagreTilLokaltMinne() {
+            if (!sisteKalkulasjon) { alert("Vennligst trykk 'BEREGN' før du lagrer stolpen."); return; }
+            let historikk = JSON.parse(localStorage.getItem('et_historikk') || '[]');
+            historikk.push({...sisteKalkulasjon, bilde: bildeBase64 ? "Ja" : "Nei", dato: new Date().toLocaleDateString()});
+            localStorage.setItem('et_historikk', JSON.stringify(historikk));
+            alert(`✅ Stolpe ${sisteKalkulasjon.stolpeNr} på mast ${sisteKalkulasjon.mastepunktNr} ble lagret i rapporten!`);
+        }
+
+        function nullstillForNesteStolpe() {
+            // Tømmer spesifikke felt for denne stolpen
+            document.getElementById('mastepunktNr').value = '';
+            document.getElementById('stolpeNr').value = '';
+            document.getElementById('montertAar').value = '';
+            document.getElementById('maaltRestskall').value = '';
+            document.getElementById('klimasone').value = '';
+            document.getElementById('jordsmonn').value = '';
+            document.getElementById('drypping').checked = false;
+            
+            // Tilbakestill bilde og resultatskjerm
+            bildeBase64 = "";
+            document.getElementById('stolpeBilde').value = '';
+            document.getElementById('bildeForhandsvisningSeksjon').classList.add('hidden');
+            document.getElementById('bildeTekst').innerText = "📷 Ta eller velg bilde av stolpen";
+            document.getElementById('resultatSeksjon').classList.add('hidden');
+            document.getElementById('alderVisning').innerText = "Aktiv alder ved kontroll: - år";
+            
+            sisteKalkulasjon = null;
+
+            // Lagrer tomme verdier for mast og stolpe, men BEHOLDER netteier og linjeId
+            localStorage.setItem('mastepunktNr', '');
+            localStorage.setItem('stolpeNr', '');
+
+            alert("🔄 Klart for neste stolpe! Netteier og LinjeID ble beholdt.");
+        }
+
+        function eksporterTilExcel() {
+            let historikk = JSON.parse(localStorage.getItem('et_historikk') || '[]');
+            if (historikk.length === 0 && sisteKalkulasjon) { historikk.push(sisteKalkulasjon); }
+            if (historikk.length === 0) { alert("Ingen lagrede data å eksportere ennå. Trykk 'LAGRE STOLPE I HISTORIKK' først."); return; }
+
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+            csvContent += "Dato;Netteier;LinjeID;MastepunktNr;StolpeNr;Montert;Kontrollert;Klimasone;Jordsmonn;MaaltRestskall;Grense;Restlevetid_Aar;Utskiftingsaar;HarBilde\r\n";
+
+            historikk.forEach(h => {
+                csvContent += `${h.dato||''};${h.netteier};${h.linjeId};${h.mastepunktNr};${h.stolpeNr};${h.montertAar};${h.kontrollertAar};${h.klimasone};${h.jordsmonn};${h.maaltRestskall};${h.utskiftingGrense};${h.estimertRestlevetid};${h.anbefaltUtskiftetAar};${h.bilde||'Nei'}\r\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `ET_Malerapport_v12_${new Date().toLocaleDateString()}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                const CACHE_NAME = 'et-raatesjekk-v12';
+                self.addEventListener('install', e => {
+                    e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(['./', './index.html', './icon.png'])));
+                });
+                self.addEventListener('fetch', e => {
+                    e.respondWith(caches.match(e.request).then(response => response || fetch(e.request)));
+                });
+            `;
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(err => console.log('SW feil:', err));
+        }
+    </script>
+</body>
+</html>
