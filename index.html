@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E.T. – Råtesjekk v16 (HMS & Sikkerhet)</title>
+    <title>E.T. – Råtesjekk v17 (Balansert SF)</title>
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
@@ -12,9 +12,9 @@
 <body class="bg-gray-50 text-gray-800 font-sans min-h-screen">
 
     <div class="max-w-2xl mx-auto px-4 py-6">
-        <header class="bg-slate-800 text-white p-5 rounded-t-xl shadow-md text-center flex flex-col items-center justify-center border-b-4 border-amber-400">
-            <h1 class="text-3xl font-black tracking-tighter text-amber-400">E.T.</h1>
-            <p class="text-xs text-gray-300 mt-1 uppercase tracking-widest font-bold">Stolpekontroll & HMS-Estimat v16</p>
+        <header class="bg-slate-800 text-white p-5 rounded-t-xl shadow-md text-center flex flex-col items-center justify-center border-b-4 border-emerald-500">
+            <h1 class="text-3xl font-black tracking-tighter text-emerald-400">E.T.</h1>
+            <p class="text-xs text-gray-300 mt-1 uppercase tracking-widest font-bold">Stolpekontroll & Balansert SF v17</p>
         </header>
 
         <main class="bg-white p-6 rounded-b-xl shadow-md border-x border-b border-gray-200 space-y-6 overflow-hidden">
@@ -150,14 +150,14 @@
                 </div>
             </div>
 
-            <div class="flex items-center justify-between bg-green-50 p-4 rounded-lg border border-green-200">
+            <div class="flex items-center justify-between bg-emerald-50 p-4 rounded-lg border border-emerald-200">
                 <div class="pr-2">
-                    <h3 class="text-sm font-bold text-green-900">Dryppimpregneres (borehull) nå?</h3>
-                    <p class="text-[10px] text-green-700">Forlenger levetid med inntil 7 år.</p>
+                    <h3 class="text-sm font-bold text-emerald-900">Dryppimpregneres (borehull) nå?</h3>
+                    <p class="text-[10px] text-emerald-700">Forlenger levetid med inntil 7 år.</p>
                 </div>
                 <label class="relative inline-flex items-center cursor-pointer select-none">
                     <input type="checkbox" id="drypping" class="sr-only peer">
-                    <div class="w-14 h-7 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-600"></div>
+                    <div class="w-14 h-7 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-emerald-600"></div>
                 </label>
             </div>
 
@@ -193,7 +193,7 @@
 
                     <div class="grid grid-cols-2 gap-3 max-w-md mx-auto">
                         <div id="sfKort" class="p-3 rounded-lg border flex flex-col items-center justify-center shadow-sm">
-                            <span class="block text-[10px] uppercase font-bold text-gray-600">Sikkerhetsfaktor</span>
+                            <span class="block text-[10px] uppercase font-bold text-gray-600">Laveste SF</span>
                             <span id="resSikkerhetsfaktor" class="text-3xl font-black">-</span>
                         </div>
                         <div class="bg-white/90 p-3 rounded-lg border border-black/10 flex flex-col items-center justify-center shadow-sm">
@@ -214,11 +214,11 @@
     <script>
         let bildeBase64 = "";
         
-        // Faktorer for nedbrytning
+        // Faktorer for nedbrytning (mm/år)
         const jordsmonnFaktorData = { fjell: 0.20, jord_pa_fjell: 0.45, myr: 0.45, asfalt: 0.55, dyrka: 0.65 };
         const klimasoneFaktorer = { kyst: 1.2, skog: 1.0, fjell: 0.8 };
         
-        // Sonevekting for reststyrke tap
+        // Sonevekting for ytre mekanisk skade
         const soneVekting = { "A": 1.0, "B": 0.6, "C": 0.3 };
 
         window.onload = () => {
@@ -253,7 +253,6 @@
         let sisteKalkulasjon = null;
 
         function beregnRestlevetid() {
-            // Lagre grunnlagsdata
             localStorage.setItem('netteier', document.getElementById('netteier').value);
             localStorage.setItem('linjeId', document.getElementById('linjeId').value);
             localStorage.setItem('mastepunktNr', document.getElementById('mastepunktNr').value);
@@ -271,14 +270,12 @@
             const valgtSoneMiljo = document.getElementById('klimasone').value;
             const valgtJord = document.getElementById('jordsmonn').value;
             
-            // Mekaniske data
             const stolpeHoyde = parseFloat(document.getElementById('stolpeHoyde').value);
             const jordbandDia = parseFloat(document.getElementById('jordbandDia').value);
             const skadeDia = parseFloat(document.getElementById('skadeDia').value);
             const skadeSoneElement = document.querySelector('input[name="skadeSone"]:checked');
             const skadeSoneValgt = skadeSoneElement ? skadeSoneElement.value : null;
 
-            // Råtedata
             const utskiftingGrense = parseFloat(document.getElementById('utskiftingGrense').value) || 35;
             const maaltRestskall = parseFloat(document.getElementById('maaltRestskall').value);
             const isDryppet = document.getElementById('drypping').checked;
@@ -293,49 +290,48 @@
                 return;
             }
 
-            // --- BEREGNING 1: Råtebasert degradering (Konservativ avrunding) ---
-            const klimasoneFaktor = klimasoneFaktorer[valgtSoneMiljo] || 1.0;
-            const raatefaktor = jordsmonnFaktorData[valgtJord] * klimasoneFaktor;
-            const marginIgjenMm = maaltRestskall - utskiftingGrense;
-            let baasisRestlevetid = 0;
+            // --- DEKOPLET BEREGNING AV SIKKERHETSFAKTORER ---
+            
+            // 1. SF for innvendig råte (Restskall vs Krav)
+            // Hvis målt er 35 og krav er 35 -> SF = 1.00
+            const sfRaate = maaltRestskall / utskiftingGrense; 
 
-            if (marginIgjenMm > 0) {
-                // Runder NED for å være konservativ på restlevetid
-                baasisRestlevetid = Math.floor(marginIgjenMm / raatefaktor);
-            }
-
-            // --- BEREGNING 2: SIKKERHETSFAKTOR (SF) ---
+            // 2. SF for ytre mekanisk skade / bøyekraft
             const reduksjon = Math.pow((skadeDia / jordbandDia), 3); 
             const soneKoeffisient = soneVekting[skadeSoneValgt]; 
             const kapasitetstap = (1 - reduksjon) * soneKoeffisient;
-            const restStyrkeProsent = Math.round((1 - kapasitetstap) * 100); 
-            
-            // REN-kravet = 75%. SF = Reststyrke / 75
-            const sikkerhetsfaktor = (restStyrkeProsent / 75).toFixed(2);
-            const sfNum = parseFloat(sikkerhetsfaktor);
-            
-            const erKritiskMekanisk = sfNum < 1.00;
-            const erMarginal = sfNum >= 1.00 && sfNum <= 1.15;
+            const restStyrkeProsent = (1 - kapasitetstap) * 100; 
+            const sfMekanisk = restStyrkeProsent / 75; // REN krav
 
-            // --- KOMBINERT RESULTAT & TAK ---
-            let estimertRestlevetid = Math.floor(baasisRestlevetid * (restStyrkeProsent / 100));
+            // Gjeldende SF er det svakeste leddet
+            const sfGjeldendeNum = Math.min(sfRaate, sfMekanisk);
+            const sikkerhetsfaktor = sfGjeldendeNum.toFixed(2);
 
-            // Straff for marginale stolper: Har de SF mellom 1.00 og 1.15, halveres teoretisk resttid
-            if (erMarginal) {
-                estimertRestlevetid = Math.floor(estimertRestlevetid / 2);
+            const erKritiskMekanisk = sfGjeldendeNum < 1.00;
+            const erMarginal = sfGjeldendeNum >= 1.00 && sfGjeldendeNum <= 1.15;
+
+            // --- RESTLEVETID BEREGNING ---
+            // Levetid er nå utelukkende knyttet til millimeter før vi når grensen, uten kunstig halvering.
+            const klimasoneFaktor = klimasoneFaktorer[valgtSoneMiljo] || 1.0;
+            const raatefaktor = jordsmonnFaktorData[valgtJord] * klimasoneFaktor;
+            const marginIgjenMm = maaltRestskall - utskiftingGrense;
+            
+            let estimertRestlevetid = 0;
+            
+            if (marginIgjenMm > 0) {
+                estimertRestlevetid = Math.floor(marginIgjenMm / raatefaktor);
             }
 
             const maksTeoretiskLevetidRest = Math.max(0, 80 - alder);
             estimertRestlevetid = Math.min(estimertRestlevetid, maksTeoretiskLevetidRest);
 
-            if (isDryppet && estimertRestlevetid > 0 && !erMarginal) {
-                estimertRestlevetid += 7; // Drypp gir full effekt på ellers friske stolper
-            } else if (isDryppet && estimertRestlevetid > 0 && erMarginal) {
-                estimertRestlevetid += 3; // Konservativt påslag for marginale stolper
+            // Dryppimpregnering forlenger
+            if (isDryppet && estimertRestlevetid > 0) {
+                estimertRestlevetid += 7;
             }
 
-            // Utskiftingsgrense nådd på råte ELLER SF er under 1.0
-            if (erKritiskMekanisk || marginIgjenMm <= 0) {
+            // Sikkerhetsstopp: Faller noen av SF-ene under 1.0, er levetiden over, uansett drypping
+            if (erKritiskMekanisk) {
                 estimertRestlevetid = 0;
             }
 
@@ -352,7 +348,7 @@
             resKort.className = "p-6 rounded-xl border text-center space-y-4 shadow-inner mt-2 ";
             sfDisplay.innerText = sikkerhetsfaktor;
 
-            if (estimertRestlevetid === 0) {
+            if (estimertRestlevetid === 0 || erKritiskMekanisk) {
                 // RØD SONE - UTSKIFTING
                 resKort.classList.add("bg-red-50", "border-red-200");
                 sfKort.className = "p-3 rounded-lg border flex flex-col items-center justify-center shadow-sm bg-red-100 border-red-300 text-red-900";
@@ -363,8 +359,8 @@
                 levetidDisplay.innerText = "UTSKIFTING";
                 levetidDisplay.classList.add("text-red-700", "text-xl"); 
                 
-                let aarsak = erKritiskMekanisk ? `sikkerhetsfaktoren er ${sikkerhetsfaktor}` : `målt restskall er under minstekravet`;
-                resKonklusjonDisplay.innerHTML = `<strong>Kritisk fare:</strong> Stolpen er underkjent fordi ${aarsak}.<br><br><strong>Aksjon:</strong> Stolpen skal rødmerkes og skiftes ut snarest. Ingen klatring.`;
+                let svakestLedd = sfRaate < sfMekanisk ? `innvendig råte (Målt: ${maaltRestskall}mm)` : `ytre styrketap i sone ${skadeSoneValgt}`;
+                resKonklusjonDisplay.innerHTML = `<strong>Kritisk fare:</strong> Stolpen er underkjent grunnet ${svakestLedd}. Laveste sikkerhetsfaktor er beregnet til ${sikkerhetsfaktor}.<br><br><strong>Aksjon:</strong> Stolpen skal rødmerkes og skiftes ut snarest.`;
             
             } else if (erMarginal) {
                 // GUL SONE - MARGINAL
@@ -377,23 +373,22 @@
                 levetidDisplay.innerText = `${estimertRestlevetid} år`;
                 levetidDisplay.classList.remove("text-red-700", "text-xl");
                 
-                resKonklusjonDisplay.innerHTML = `<strong>Advarsel:</strong> Sikkerhetsfaktoren er marginal (${sikkerhetsfaktor}). Nedbrytningstakt forventes å akselerere. Klatring skal kun skje med ekstra sikring. Vurderes skiftet ved neste revisjon.`;
+                resKonklusjonDisplay.innerHTML = `<strong>Advarsel:</strong> Sikkerhetsfaktoren er marginal (${sikkerhetsfaktor}). Klatring skal kun skje med ekstra sikring. Vurderes skiftet ved neste revisjon.`;
                 
             } else {
                 // GRØNN SONE - GODKJENT
                 resKort.classList.add("bg-slate-50", "border-slate-200");
-                sfKort.className = "p-3 rounded-lg border flex flex-col items-center justify-center shadow-sm bg-green-100 border-green-300 text-green-800";
+                sfKort.className = "p-3 rounded-lg border flex flex-col items-center justify-center shadow-sm bg-emerald-100 border-emerald-300 text-emerald-800";
                 
-                hmsVarselKort.className = "bg-green-600 text-white p-3 rounded-lg border-2 border-green-800 shadow-sm max-w-sm mx-auto my-2";
+                hmsVarselKort.className = "bg-emerald-600 text-white p-3 rounded-lg border-2 border-emerald-800 shadow-sm max-w-sm mx-auto my-2";
                 hmsStatusDisplay.innerText = "✅ KLATREKLAR";
 
                 levetidDisplay.innerText = `${estimertRestlevetid} år`;
                 levetidDisplay.classList.remove("text-red-700", "text-xl");
                 
-                resKonklusjonDisplay.innerHTML = `Sikkerhetsmarginen er tilfredsstillende (SF ${sikkerhetsfaktor}). Estimatet gir stolpen ${estimertRestlevetid} år gjenværende levetid.`;
+                resKonklusjonDisplay.innerHTML = `Sikkerhetsmarginen er godkjent (SF ${sikkerhetsfaktor}). Estimatet gir stolpen ${estimertRestlevetid} år gjenværende levetid.`;
             }
 
-            // Lagre til minne
             sisteKalkulasjon = { 
                 netteier, linjeId, mastepunktNr, stolpeNr, montertAar, kontrollertAar, 
                 klimasone: valgtSoneMiljo, jordsmonn: valgtJord, 
@@ -453,7 +448,7 @@
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `ET_HMS_v16_${new Date().toLocaleDateString()}.csv`);
+            link.setAttribute("download", `ET_Balansert_v17_${new Date().toLocaleDateString()}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
