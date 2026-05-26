@@ -3,18 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E.T. – Råtesjekk v17 (Balansert SF)</title>
+    <title>E.T. – Råtesjekk v12</title>
+    
+    <meta name="author" content="E.T. og Sprekkanalyse - Opphavsrett 2026">
+    
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="manifest" href="manifest.json">
+
+    <style>
+        /* Sikkerhetslås for stil */
+        body {
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        /* Vannmerke */
+        .vannmerke {
+            position: fixed; top: 10px; right: 10px; z-index: 9999;
+            font-size: 10px; color: rgba(0,0,0,0.1); pointer-events: none;
+        }
+    </style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans min-h-screen">
+    
+    <div class="vannmerke">Kun for autorisert bruk - Vestmyra16</div>
 
     <div class="max-w-2xl mx-auto px-4 py-6">
-        <header class="bg-slate-800 text-white p-5 rounded-t-xl shadow-md text-center flex flex-col items-center justify-center border-b-4 border-emerald-500">
-            <h1 class="text-3xl font-black tracking-tighter text-emerald-400">E.T.</h1>
-            <p class="text-xs text-gray-300 mt-1 uppercase tracking-widest font-bold">Stolpekontroll & Balansert SF v17</p>
+        <header class="bg-green-700 text-white p-5 rounded-t-xl shadow-md text-center flex flex-col items-center justify-center">
+            <img src="icon.png" alt="E.T. Råtesjekk" class="w-24 h-24 mb-3 rounded-xl shadow-md">
+            <h1 class="text-3xl font-black tracking-tighter text-amber-300">E.T.</h1>
+            <p class="text-xs text-green-100 mt-1 uppercase tracking-wider font-bold">Råtesjekk – Sone- & Restlevetidskalkulator</p>
         </header>
 
         <main class="bg-white p-6 rounded-b-xl shadow-md border-x border-b border-gray-200 space-y-6 overflow-hidden">
@@ -39,14 +58,14 @@
                         </div>
                         <div>
                             <label class="block text-[11px] font-medium text-gray-600 mb-0.5">Stolpe nr.</label>
-                            <input type="text" id="stolpeNr" placeholder="Eks. Stolpe 3" class="w-full p-2 border rounded bg-white text-sm">
+                            <input type="text" id="stolpeNr" placeholder="Eks. Stolpe 3 / B-bein" class="w-full p-2 border rounded bg-white text-sm">
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 border-b pb-1">2. Alder & Miljø</h2>
+                <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 border-b pb-1">2. Alder & Soneplassering</h2>
                 <div class="space-y-4">
                     <div class="grid grid-cols-2 gap-3">
                         <div>
@@ -64,9 +83,9 @@
                             <label class="block text-[11px] font-medium text-gray-600 mb-0.5">Klimasone</label>
                             <select id="klimasone" class="w-full p-2.5 border rounded bg-white text-sm font-medium">
                                 <option value="">-- Velg klimasone --</option>
-                                <option value="kyst">Kystsone / Innmark</option>
-                                <option value="skog">Skog / Innlandssone</option>
-                                <option value="fjell">Fjellsone</option>
+                                <option value="kyst">Kystsone / Innmark (0 - 50 moh)</option>
+                                <option value="skog">Skog / Innlandssone (50 - 300 moh)</option>
+                                <option value="fjell">Fjellsone (Over 300 moh)</option>
                             </select>
                         </div>
                         <div>
@@ -85,48 +104,14 @@
                 </div>
             </div>
 
-            <div class="bg-blue-50/50 p-4 rounded-lg border border-blue-200">
-                <h2 class="text-xs font-semibold text-blue-800 uppercase tracking-wider mb-3 border-b border-blue-200 pb-1">3. Dimensjoner & Skadesone (Bøyekrefter)</h2>
-                
-                <div class="grid grid-cols-3 gap-3 mb-3">
-                    <div>
-                        <label class="block text-[10px] font-medium text-blue-900 mb-0.5">Høyde på stolpe (m)</label>
-                        <input type="number" id="stolpeHoyde" placeholder="Eks. 12" class="w-full p-2 border border-blue-300 rounded bg-white text-sm text-center">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-medium text-blue-900 mb-0.5">Jordbånd-Ø (mm)</label>
-                        <input type="number" id="jordbandDia" placeholder="Eks. 250" class="w-full p-2 border border-blue-300 rounded bg-white text-sm text-center">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-medium text-blue-900 mb-0.5">Skadested-Ø (mm)</label>
-                        <input type="number" id="skadeDia" placeholder="Eks. 210" class="w-full p-2 border border-blue-400 rounded bg-white text-sm font-bold text-center focus:ring-2 focus:ring-blue-400">
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-[11px] font-medium text-blue-900 mb-1">Hvor på stolpen er skaden lokalisert?</label>
-                    <div class="grid grid-cols-3 gap-2">
-                        <label class="flex flex-col items-center p-2 border border-blue-300 bg-white rounded cursor-pointer hover:bg-blue-100 has-[:checked]:bg-blue-600 has-[:checked]:text-white transition">
-                            <input type="radio" name="skadeSone" value="A" class="sr-only">
-                            <span class="font-bold text-sm">Sone A</span>
-                            <span class="text-[10px]">(0 - 5 m)</span>
-                        </label>
-                        <label class="flex flex-col items-center p-2 border border-blue-300 bg-white rounded cursor-pointer hover:bg-blue-100 has-[:checked]:bg-blue-600 has-[:checked]:text-white transition">
-                            <input type="radio" name="skadeSone" value="B" class="sr-only">
-                            <span class="font-bold text-sm">Sone B</span>
-                            <span class="text-[10px]">(5 - 10 m)</span>
-                        </label>
-                        <label class="flex flex-col items-center p-2 border border-blue-300 bg-white rounded cursor-pointer hover:bg-blue-100 has-[:checked]:bg-blue-600 has-[:checked]:text-white transition">
-                            <input type="radio" name="skadeSone" value="C" class="sr-only">
-                            <span class="font-bold text-sm">Sone C</span>
-                            <span class="text-[10px]">(10m til topp)</span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-
             <div class="bg-amber-50/50 p-4 rounded-lg border border-amber-200">
-                <h2 class="text-xs font-semibold text-amber-800 uppercase tracking-wider mb-3 border-b border-amber-200 pb-1">4. Tilstandskontroll (Råte / Restskall)</h2>
+                <h2 class="text-xs font-semibold text-amber-800 uppercase tracking-wider mb-3 border-b border-amber-200 pb-1">3. Tilstandskontroll (Innvendig Råte)</h2>
+                
+                <div class="mb-3">
+                    <label class="block text-[11px] font-medium text-amber-900 mb-0.5">Stolpediameter i råtesonen (mm)</label>
+                    <input type="number" id="diameter" placeholder="Eks. 280" class="w-full p-2 border border-amber-300 rounded bg-white text-lg font-black text-center text-amber-900">
+                </div>
+
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-[11px] font-medium text-amber-900 mb-0.5">Utskiftingsgrense (mm)</label>
@@ -134,15 +119,15 @@
                     </div>
                     <div>
                         <label class="block text-[11px] font-medium text-amber-900 mb-0.5">MÅLT restskall (mm)</label>
-                        <input type="number" id="maaltRestskall" placeholder="Tast inn" class="w-full p-2 border border-amber-400 rounded bg-white text-lg font-black text-center text-amber-950 focus:ring-2 focus:ring-amber-400">
+                        <input type="number" id="maaltRestskall" placeholder="Tast inn" class="w-full p-2 border border-amber-400 rounded bg-white text-lg font-black text-center text-blue-950 focus:ring-2 focus:ring-amber-400">
                     </div>
                 </div>
             </div>
 
             <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-2">
-                <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider border-b pb-1">5. Fotodokumentasjon</h2>
+                <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider border-b pb-1">4. Fotodokumentasjon</h2>
                 <label class="w-full flex flex-col items-center px-4 py-2 bg-white text-gray-700 rounded-lg border shadow-sm tracking-wide uppercase border-blue-200 cursor-pointer hover:bg-blue-50 transition text-xs font-bold">
-                    <span id="bildeTekst">📷 Ta eller velg bilde</span>
+                    <span id="bildeTekst">📷 Ta eller velg bilde av stolpen</span>
                     <input type="file" accept="image/*" id="stolpeBilde" class="hidden" onchange="handterBilde(this)">
                 </label>
                 <div id="bildeForhandsvisningSeksjon" class="hidden flex justify-center pt-2">
@@ -150,61 +135,52 @@
                 </div>
             </div>
 
-            <div class="flex items-center justify-between bg-emerald-50 p-4 rounded-lg border border-emerald-200">
+            <div class="flex items-center justify-between bg-green-50 p-4 rounded-lg border border-green-200">
                 <div class="pr-2">
-                    <h3 class="text-sm font-bold text-emerald-900">Dryppimpregneres (borehull) nå?</h3>
-                    <p class="text-[10px] text-emerald-700">Forlenger levetid med inntil 7 år.</p>
+                    <h3 class="text-sm font-bold text-green-900">Dryppimpregneres (borehull) nå?</h3>
+                    <p class="text-xs text-green-700">Tilstrekkelig drypping utsetter videre råte og forlenger levetid med ca. 7 år.</p>
                 </div>
                 <label class="relative inline-flex items-center cursor-pointer select-none">
                     <input type="checkbox" id="drypping" class="sr-only peer">
-                    <div class="w-14 h-7 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-emerald-600"></div>
+                    <div class="w-14 h-7 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-600"></div>
                 </label>
             </div>
 
             <div class="space-y-2">
-                <button onclick="beregnRestlevetid()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 px-4 rounded-lg shadow-lg text-center text-md tracking-wide cursor-pointer transition transform active:scale-95 border border-slate-950">
-                    BEREGN SIKKERHETSESTIMAT
+                <button onclick="beregnRestlevetid()" class="w-full bg-green-800 hover:bg-green-900 text-white font-bold py-3 px-4 rounded-lg shadow-lg text-center text-md tracking-wide cursor-pointer transition transform active:scale-95">
+                    BEREGN & GENERER RAPPORT
                 </button>
                 
                 <div class="grid grid-cols-1 gap-2 pt-1">
-                    <button onclick="lagreTilLokaltMinne()" class="w-full bg-blue-700 hover:bg-blue-800 text-white text-sm font-bold py-2.5 rounded-lg shadow cursor-pointer transition">
+                    <button class="w-full bg-blue-700 hover:bg-blue-800 text-white text-sm font-bold py-2.5 rounded-lg shadow cursor-pointer transition">
                         💾 LAGRE STOLPE I HISTORIKK
                     </button>
                 </div>
-
                 <div class="grid grid-cols-2 gap-2 pt-1">
-                    <button onclick="nullstillForNesteStolpe()" class="bg-gray-600 hover:bg-gray-700 text-white text-xs font-bold py-2 rounded shadow cursor-pointer transition">
+                    <button onclick="window.scrollTo(0,0); location.reload();" class="bg-gray-600 hover:bg-gray-700 text-white text-xs font-bold py-2 rounded shadow cursor-pointer transition">
                         🔄 NESTE STOLPE
                     </button>
-                    <button onclick="eksporterTilExcel()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2 rounded shadow cursor-pointer transition">
+                    <button class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2 rounded shadow cursor-pointer transition">
                         📊 EKSPORTER TIL EXCEL
                     </button>
                 </div>
             </div>
 
             <div id="resultatSeksjon" class="hidden transition-all duration-300">
-                <div id="resultatKort" class="p-6 rounded-xl border text-center space-y-4 shadow-inner mt-2">
-                    <h2 class="text-xs font-bold uppercase tracking-widest text-gray-600">HMS & TILSTANDSKONKLUSJON</h2>
-                    
-                    <div class="bg-white p-3 rounded-lg border shadow-sm max-w-sm mx-auto my-2" id="hmsVarselKort">
-                        <span class="block text-[11px] uppercase font-bold text-gray-500 mb-1">Klatrestatus</span>
-                        <span id="resHmsStatus" class="text-lg font-black tracking-wide block">-</span>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3 max-w-md mx-auto">
-                        <div id="sfKort" class="p-3 rounded-lg border flex flex-col items-center justify-center shadow-sm">
-                            <span class="block text-[10px] uppercase font-bold text-gray-600">Laveste SF</span>
-                            <span id="resSikkerhetsfaktor" class="text-3xl font-black">-</span>
-                        </div>
-                        <div class="bg-white/90 p-3 rounded-lg border border-black/10 flex flex-col items-center justify-center shadow-sm">
+                <div id="resultatKort" class="p-6 rounded-xl border text-center space-y-4 shadow-inner">
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-gray-600">E.T. RÅTESJEKK KONKLUSJON</h2>
+                    <div class="grid grid-cols-2 gap-2 max-w-sm mx-auto">
+                        <div class="bg-white/90 p-3 rounded-lg border border-black/10">
                             <span class="block text-[10px] uppercase font-bold text-gray-500">Restlevetid</span>
-                            <span id="resRestlevetid" class="text-3xl font-black text-gray-900">-</span>
+                            <span id="resRestlevetid" class="text-3xl font-black text-gray-900">- år</span>
+                        </div>
+                        <div class="bg-white/90 p-3 rounded-lg border border-black/10">
+                            <span class="block text-[10px] uppercase font-bold text-gray-500">Utskiftingsår</span>
+                            <span id="resUtskiftingsAar" class="text-3xl font-black text-gray-900">-</span>
                         </div>
                     </div>
-                    
-                    <div class="bg-white/95 p-3.5 rounded-lg text-sm border border-black/5 text-left space-y-1.5 max-w-md mx-auto shadow-inner mt-4">
-                        <p class="text-xs text-gray-800 font-medium" id="resKonklusjonTekst"></p>
-                    </div>
+                    <div class="bg-white/95 p-3.5 rounded-lg text-sm border border-black/5 text-left space-y-1.5 max-w-md mx-auto shadow-inner" id="resKonklusjonBoks">
+                        </div>
                 </div>
             </div>
 
@@ -212,20 +188,27 @@
     </div>
 
     <script>
-        let bildeBase64 = "";
-        
-        // Faktorer for nedbrytning (mm/år)
-        const jordsmonnFaktorData = { fjell: 0.20, jord_pa_fjell: 0.45, myr: 0.45, asfalt: 0.55, dyrka: 0.65 };
-        const klimasoneFaktorer = { kyst: 1.2, skog: 1.0, fjell: 0.8 };
-        
-        // Sonevekting for ytre mekanisk skade
-        const soneVekting = { "A": 1.0, "B": 0.6, "C": 0.3 };
+        // 🔒 START SIKKERHETSLÅS
+        document.addEventListener("DOMContentLoaded", () => {
+            document.addEventListener('contextmenu', event => event.preventDefault());
+            document.addEventListener('copy', event => event.preventDefault());
+
+            const gyldigDomene = "vestmyra16.github.io";
+            if (window.location.hostname !== "" && window.location.hostname !== gyldigDomene) {
+                document.body.innerHTML = ""; 
+                return; 
+            }
+
+            const utlopsDato = new Date("2026-07-13");
+            if (new Date() > utlopsDato) {
+                alert("Testperioden er utløpt.");
+                window.location.href = "about:blank";
+                return;
+            }
+        });
+        // 🔒 SLUTT SIKKERHETSLÅS
 
         window.onload = () => {
-            document.getElementById('netteier').value = localStorage.getItem('netteier') || '';
-            document.getElementById('linjeId').value = localStorage.getItem('linjeId') || '';
-            document.getElementById('mastepunktNr').value = localStorage.getItem('mastepunktNr') || '';
-            document.getElementById('stolpeNr').value = localStorage.getItem('stolpeNr') || '';
             document.getElementById('kontrollertAar').value = new Date().getFullYear();
         };
 
@@ -233,8 +216,7 @@
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    bildeBase64 = e.target.result;
-                    document.getElementById('bildeVisning').src = bildeBase64;
+                    document.getElementById('bildeVisning').src = e.target.result;
                     document.getElementById('bildeForhandsvisningSeksjon').classList.remove('hidden');
                     document.getElementById('bildeTekst').innerText = "✅ Bilde er registrert!";
                 }
@@ -250,209 +232,43 @@
             }
         }
 
-        let sisteKalkulasjon = null;
-
         function beregnRestlevetid() {
-            localStorage.setItem('netteier', document.getElementById('netteier').value);
-            localStorage.setItem('linjeId', document.getElementById('linjeId').value);
-            localStorage.setItem('mastepunktNr', document.getElementById('mastepunktNr').value);
-            localStorage.setItem('stolpeNr', document.getElementById('stolpeNr').value);
-
-            const netteier = document.getElementById('netteier').value || 'Ukjent';
-            const linjeId = document.getElementById('linjeId').value || 'Ukjent';
-            const mastepunktNr = document.getElementById('mastepunktNr').value || 'Ukjent';
-            const stolpeNr = document.getElementById('stolpeNr').value || 'Ukjent';
+            const dia = parseFloat(document.getElementById('diameter').value);
+            const restskall = parseFloat(document.getElementById('maaltRestskall').value);
+            const grense = parseFloat(document.getElementById('utskiftingGrense').value);
+            const kontrollAar = parseInt(document.getElementById('kontrollertAar').value);
             
-            const montertAar = parseInt(document.getElementById('montertAar').value);
-            const kontrollertAar = parseInt(document.getElementById('kontrollertAar').value) || new Date().getFullYear();
-            const alder = kontrollertAar - montertAar;
-
-            const valgtSoneMiljo = document.getElementById('klimasone').value;
-            const valgtJord = document.getElementById('jordsmonn').value;
-            
-            const stolpeHoyde = parseFloat(document.getElementById('stolpeHoyde').value);
-            const jordbandDia = parseFloat(document.getElementById('jordbandDia').value);
-            const skadeDia = parseFloat(document.getElementById('skadeDia').value);
-            const skadeSoneElement = document.querySelector('input[name="skadeSone"]:checked');
-            const skadeSoneValgt = skadeSoneElement ? skadeSoneElement.value : null;
-
-            const utskiftingGrense = parseFloat(document.getElementById('utskiftingGrense').value) || 35;
-            const maaltRestskall = parseFloat(document.getElementById('maaltRestskall').value);
-            const isDryppet = document.getElementById('drypping').checked;
-
-            if (!montertAar || !valgtSoneMiljo || !valgtJord || isNaN(maaltRestskall) || !jordbandDia || !skadeDia || !skadeSoneValgt) {
-                alert("Vennligst fyll ut alle felter (Alder, Miljø, Dimensjoner og Sone).");
+            if (isNaN(dia) || isNaN(restskall) || isNaN(grense)) {
+                alert("Vennligst fyll ut diameter, utskiftingsgrense og målt restskall.");
                 return;
             }
 
-            if (skadeDia > jordbandDia) {
-                alert("Advarsel: Diameter på skadested kan ikke være større enn jordbånddiameter!");
-                return;
-            }
+            // 1. Beregn klatresikkerhet (10% regel eller 35mm absolutt minimum)
+            let minSikkerhetsKrav = Math.max(35, dia * 0.1);
+            let sf = (restskall / minSikkerhetsKrav).toFixed(2);
+            let klatreAnbefaling = "";
 
-            // --- DEKOPLET BEREGNING AV SIKKERHETSFAKTORER ---
-            
-            // 1. SF for innvendig råte (Restskall vs Krav)
-            // Hvis målt er 35 og krav er 35 -> SF = 1.00
-            const sfRaate = maaltRestskall / utskiftingGrense; 
-
-            // 2. SF for ytre mekanisk skade / bøyekraft
-            const reduksjon = Math.pow((skadeDia / jordbandDia), 3); 
-            const soneKoeffisient = soneVekting[skadeSoneValgt]; 
-            const kapasitetstap = (1 - reduksjon) * soneKoeffisient;
-            const restStyrkeProsent = (1 - kapasitetstap) * 100; 
-            const sfMekanisk = restStyrkeProsent / 75; // REN krav
-
-            // Gjeldende SF er det svakeste leddet
-            const sfGjeldendeNum = Math.min(sfRaate, sfMekanisk);
-            const sikkerhetsfaktor = sfGjeldendeNum.toFixed(2);
-
-            const erKritiskMekanisk = sfGjeldendeNum < 1.00;
-            const erMarginal = sfGjeldendeNum >= 1.00 && sfGjeldendeNum <= 1.15;
-
-            // --- RESTLEVETID BEREGNING ---
-            // Levetid er nå utelukkende knyttet til millimeter før vi når grensen, uten kunstig halvering.
-            const klimasoneFaktor = klimasoneFaktorer[valgtSoneMiljo] || 1.0;
-            const raatefaktor = jordsmonnFaktorData[valgtJord] * klimasoneFaktor;
-            const marginIgjenMm = maaltRestskall - utskiftingGrense;
-            
-            let estimertRestlevetid = 0;
-            
-            if (marginIgjenMm > 0) {
-                estimertRestlevetid = Math.floor(marginIgjenMm / raatefaktor);
-            }
-
-            const maksTeoretiskLevetidRest = Math.max(0, 80 - alder);
-            estimertRestlevetid = Math.min(estimertRestlevetid, maksTeoretiskLevetidRest);
-
-            // Dryppimpregnering forlenger
-            if (isDryppet && estimertRestlevetid > 0) {
-                estimertRestlevetid += 7;
-            }
-
-            // Sikkerhetsstopp: Faller noen av SF-ene under 1.0, er levetiden over, uansett drypping
-            if (erKritiskMekanisk) {
-                estimertRestlevetid = 0;
-            }
-
-            // --- VIS RESULTATER & HMS-VARSEL ---
-            document.getElementById('resultatSeksjon').classList.remove('hidden');
-            const resKort = document.getElementById('resultatKort');
-            const hmsVarselKort = document.getElementById('hmsVarselKort');
-            const hmsStatusDisplay = document.getElementById('resHmsStatus');
-            const sfKort = document.getElementById('sfKort');
-            const sfDisplay = document.getElementById('resSikkerhetsfaktor');
-            const levetidDisplay = document.getElementById('resRestlevetid');
-            const resKonklusjonDisplay = document.getElementById('resKonklusjonTekst');
-
-            resKort.className = "p-6 rounded-xl border text-center space-y-4 shadow-inner mt-2 ";
-            sfDisplay.innerText = sikkerhetsfaktor;
-
-            if (estimertRestlevetid === 0 || erKritiskMekanisk) {
-                // RØD SONE - UTSKIFTING
-                resKort.classList.add("bg-red-50", "border-red-200");
-                sfKort.className = "p-3 rounded-lg border flex flex-col items-center justify-center shadow-sm bg-red-100 border-red-300 text-red-900";
-                
-                hmsVarselKort.className = "bg-red-600 text-white p-3 rounded-lg border-2 border-red-800 shadow-md max-w-sm mx-auto my-2 animate-pulse";
-                hmsStatusDisplay.innerText = "⛔ KLATREFORBUD";
-                
-                levetidDisplay.innerText = "UTSKIFTING";
-                levetidDisplay.classList.add("text-red-700", "text-xl"); 
-                
-                let svakestLedd = sfRaate < sfMekanisk ? `innvendig råte (Målt: ${maaltRestskall}mm)` : `ytre styrketap i sone ${skadeSoneValgt}`;
-                resKonklusjonDisplay.innerHTML = `<strong>Kritisk fare:</strong> Stolpen er underkjent grunnet ${svakestLedd}. Laveste sikkerhetsfaktor er beregnet til ${sikkerhetsfaktor}.<br><br><strong>Aksjon:</strong> Stolpen skal rødmerkes og skiftes ut snarest.`;
-            
-            } else if (erMarginal) {
-                // GUL SONE - MARGINAL
-                resKort.classList.add("bg-amber-50", "border-amber-200");
-                sfKort.className = "p-3 rounded-lg border flex flex-col items-center justify-center shadow-sm bg-amber-100 border-amber-300 text-amber-900";
-                
-                hmsVarselKort.className = "bg-amber-400 text-amber-950 p-3 rounded-lg border-2 border-amber-600 shadow-md max-w-sm mx-auto my-2";
-                hmsStatusDisplay.innerText = "⚠️ KREVER SIKRING (LIFT/STIGESKO)";
-                
-                levetidDisplay.innerText = `${estimertRestlevetid} år`;
-                levetidDisplay.classList.remove("text-red-700", "text-xl");
-                
-                resKonklusjonDisplay.innerHTML = `<strong>Advarsel:</strong> Sikkerhetsfaktoren er marginal (${sikkerhetsfaktor}). Klatring skal kun skje med ekstra sikring. Vurderes skiftet ved neste revisjon.`;
-                
+            if (restskall < minSikkerhetsKrav) {
+                klatreAnbefaling = `<span class="text-red-700 font-black">🔴 KLATRING FRARÅDES (SF: ${sf})</span><br>Sikkerhetsfaktor er for lav. Vurder stolpeforsterkning eller bruk lift.`;
+            } else if (restskall <= minSikkerhetsKrav + 20) {
+                klatreAnbefaling = `<span class="text-amber-600 font-black">🟡 VURDERINGSSONE (SF: ${sf})</span><br>Klatring krever skjønn. Sjekk vind, vinkelstrekk og treverkets kvalitet.`;
             } else {
-                // GRØNN SONE - GODKJENT
-                resKort.classList.add("bg-slate-50", "border-slate-200");
-                sfKort.className = "p-3 rounded-lg border flex flex-col items-center justify-center shadow-sm bg-emerald-100 border-emerald-300 text-emerald-800";
-                
-                hmsVarselKort.className = "bg-emerald-600 text-white p-3 rounded-lg border-2 border-emerald-800 shadow-sm max-w-sm mx-auto my-2";
-                hmsStatusDisplay.innerText = "✅ KLATREKLAR";
-
-                levetidDisplay.innerText = `${estimertRestlevetid} år`;
-                levetidDisplay.classList.remove("text-red-700", "text-xl");
-                
-                resKonklusjonDisplay.innerHTML = `Sikkerhetsmarginen er godkjent (SF ${sikkerhetsfaktor}). Estimatet gir stolpen ${estimertRestlevetid} år gjenværende levetid.`;
+                klatreAnbefaling = `<span class="text-green-700 font-black">🟢 TRYGG (SF: ${sf})</span><br>God sikkerhetsmargin for klatring under normale forhold.`;
             }
 
-            sisteKalkulasjon = { 
-                netteier, linjeId, mastepunktNr, stolpeNr, montertAar, kontrollertAar, 
-                klimasone: valgtSoneMiljo, jordsmonn: valgtJord, 
-                stolpeHoyde, jordbandDia, skadeDia, skadeSone: skadeSoneValgt, sikkerhetsfaktor,
-                maaltRestskall, utskiftingGrense, estimertRestlevetid, klatrestatus: hmsStatusDisplay.innerText 
-            };
-        }
+            // 2. Beregn Restlevetid (Forenklet: 1.5mm råtehastighet per år)
+            let levetid = 0;
+            if (restskall > grense) {
+                levetid = Math.round((restskall - grense) / 1.5);
+            }
+            if (document.getElementById('drypping').checked) {
+                levetid += 7; // Drypping legger til anslått levetid
+            }
 
-        function lagreTilLokaltMinne() {
-            if (!sisteKalkulasjon) { alert("Vennligst beregn estimat før du lagrer."); return; }
-            let historikk = JSON.parse(localStorage.getItem('et_historikk') || '[]');
-            historikk.push({...sisteKalkulasjon, bilde: bildeBase64 ? "Ja" : "Nei", dato: new Date().toLocaleDateString()});
-            localStorage.setItem('et_historikk', JSON.stringify(historikk));
-            alert(`✅ Stolpe lagret i historikk!`);
-        }
-
-        function nullstillForNesteStolpe() {
-            document.getElementById('mastepunktNr').value = '';
-            document.getElementById('stolpeNr').value = '';
-            document.getElementById('maaltRestskall').value = '';
-            document.getElementById('stolpeHoyde').value = '';
-            document.getElementById('jordbandDia').value = '';
-            document.getElementById('skadeDia').value = '';
+            // 3. Generer output
+            document.getElementById('resRestlevetid').innerText = levetid + " år";
+            document.getElementById('resUtskiftingsAar').innerText = (kontrollAar + levetid) || "-";
             
-            const skadeSoneEle = document.querySelector('input[name="skadeSone"]:checked');
-            if(skadeSoneEle) skadeSoneEle.checked = false;
-
-            document.getElementById('drypping').checked = false;
-            
-            bildeBase64 = "";
-            document.getElementById('stolpeBilde').value = '';
-            document.getElementById('bildeForhandsvisningSeksjon').classList.add('hidden');
-            document.getElementById('bildeTekst').innerText = "📷 Ta eller velg bilde";
-            document.getElementById('resultatSeksjon').classList.add('hidden');
-            document.getElementById('alderVisning').innerText = "Aktiv alder ved kontroll: - år";
-            
-            sisteKalkulasjon = null;
-            localStorage.setItem('mastepunktNr', '');
-            localStorage.setItem('stolpeNr', '');
-
-            alert("🔄 Klart for neste stolpe! Netteier og LinjeID beholdes.");
-        }
-
-        function eksporterTilExcel() {
-            let historikk = JSON.parse(localStorage.getItem('et_historikk') || '[]');
-            if (historikk.length === 0 && sisteKalkulasjon) { historikk.push(sisteKalkulasjon); }
-            if (historikk.length === 0) { alert("Ingen lagrede data. Lagre en stolpe først."); return; }
-
-            let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
-            csvContent += "Dato;Netteier;LinjeID;MastepunktNr;StolpeNr;Alder;Klimasone;Jordsmonn;Hoyde(m);JordbandDia(mm);SkadestedDia(mm);SkadeSone;MaaltRestskall(mm);Grense(mm);Sikkerhetsfaktor;Restlevetid(aar);Klatrestatus\r\n";
-
-            historikk.forEach(h => {
-                let alder = h.kontrollertAar - h.montertAar;
-                csvContent += `${h.dato||''};${h.netteier};${h.linjeId};${h.mastepunktNr};${h.stolpeNr};${alder};${h.klimasone};${h.jordsmonn};${h.stolpeHoyde||''};${h.jordbandDia||''};${h.skadeDia||''};${h.skadeSone||''};${h.maaltRestskall};${h.utskiftingGrense};${h.sikkerhetsfaktor||''};${h.estimertRestlevetid};${h.klatrestatus||''}\r\n`;
-            });
-
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `ET_Balansert_v17_${new Date().toLocaleDateString()}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-    </script>
-</body>
-</html>
+            let vedlikeholdTekst = levetid <= 0 
+                ? "Stolpen har nådd utskiftingsgrensen og krever tiltak." 
+                : "Stolpen har restlevetid. Følg opp ved neste rutine
