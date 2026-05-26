@@ -102,9 +102,15 @@
             <div class="bg-amber-50/50 p-4 rounded-lg border border-amber-200">
                 <h2 class="text-xs font-semibold text-amber-800 uppercase tracking-wider mb-3 border-b border-amber-200 pb-1">3. Tilstandskontroll (Innvendig Råte)</h2>
                 
-                <div class="mb-3">
-                    <label class="block text-[11px] font-medium text-amber-900 mb-0.5">Stolpediameter i råtesonen (mm)</label>
-                    <input type="number" id="diameter" placeholder="Eks. 350" class="w-full p-2 border border-amber-300 rounded bg-white text-lg font-black text-center text-amber-900">
+                <div class="grid grid-cols-2 gap-3 mb-3">
+                    <div>
+                        <label class="block text-[11px] font-medium text-amber-900 mb-0.5">Stolpediameter på skadested (mm)</label>
+                        <input type="number" id="diameter" placeholder="Eks. 300" class="w-full p-2 border border-amber-300 rounded bg-white text-sm font-bold text-center text-amber-900">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-medium text-amber-900 mb-0.5">Skadehøyde over bakken (m)</label>
+                        <input type="number" id="skadehoyde" placeholder="Eks. 1.5" step="0.1" class="w-full p-2 border border-amber-300 rounded bg-white text-sm font-bold text-center text-amber-900">
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
@@ -232,30 +238,38 @@
         function beregnRestlevetid() {
             try {
                 const diaRaw = document.getElementById('diameter').value;
+                const skadehoydeRaw = document.getElementById('skadehoyde').value;
                 const restRaw = document.getElementById('maaltRestskall').value;
                 const grenseRaw = document.getElementById('utskiftingGrense').value;
 
-                if (!diaRaw || !restRaw || !grenseRaw) {
-                    alert("Vennligst fyll inn verdier for stolpediameter, utskiftingsgrense og målt restskall før du beregner.");
+                if (!diaRaw || !skadehoydeRaw || !restRaw || !grenseRaw) {
+                    alert("Vennligst fyll inn verdier for stolpediameter, skadehøyde, utskiftingsgrense og målt restskall før du beregner.");
                     return;
                 }
 
                 const dia = parseFloat(diaRaw);
+                const skadehoyde = parseFloat(skadehoydeRaw);
                 const restskall = parseFloat(restRaw);
                 const grense = parseFloat(grenseRaw);
                 const kontrollAar = parseInt(document.getElementById('kontrollertAar').value) || new Date().getFullYear();
 
-                // 1. Beregn klatresikkerhet (10% regel eller 35mm absolutt minimum)
+                // 1. Beregn klatresikkerhet
                 let minSikkerhetsKrav = Math.max(35, dia * 0.1);
                 let sf = (restskall / minSikkerhetsKrav).toFixed(2);
                 let klatreAnbefaling = "";
 
-                if (restskall < minSikkerhetsKrav) {
-                    klatreAnbefaling = `<span class="text-red-700 font-black">🔴 KLATRING FRARÅDES (SF: ${sf})</span><br>Sikkerhetsfaktor er under 1.0. Stolpen må forsterkes eller klatres fra lift.`;
-                } else if (restskall <= minSikkerhetsKrav + 20) {
-                    klatreAnbefaling = `<span class="text-amber-600 font-black">🟡 VURDERINGSSONE (SF: ${sf})</span><br>Klatring krever skjønn. Sjekk vind, vinkelstrekk og treverkets kvalitet.`;
+                if (skadehoyde <= 5.0) {
+                    // SONE A: Kritisk sone (Knekkpunkt)
+                    if (restskall < minSikkerhetsKrav) {
+                        klatreAnbefaling = `<span class="text-red-700 font-black">🔴 KLATRING FRARÅDES (Sone A - SF: ${sf})</span><br>Skade i kritisk sone. Sikkerhetsfaktor under 1.0. Stolpen må forsterkes eller klatres fra lift.`;
+                    } else if (restskall <= minSikkerhetsKrav + 20) {
+                        klatreAnbefaling = `<span class="text-amber-600 font-black">🟡 VURDERINGSSONE (Sone A - SF: ${sf})</span><br>Skade i kritisk sone. Klatring krever skjønn. Sjekk vind, vinkelstrekk og treverkets kvalitet.`;
+                    } else {
+                        klatreAnbefaling = `<span class="text-green-700 font-black">🟢 TRYGG (Sone A - SF: ${sf})</span><br>God sikkerhetsmargin for klatring i kritisk sone under normale forhold.`;
+                    }
                 } else {
-                    klatreAnbefaling = `<span class="text-green-700 font-black">🟢 TRYGG (SF: ${sf})</span><br>God sikkerhetsmargin for klatring under normale forhold.`;
+                    // SONE B: Sikker sone (Over 5m)
+                    klatreAnbefaling = `<span class="text-green-700 font-black">🟢 TRYGG (Sone B)</span><br>Skaden er over knekkpunktet (>5m). Hovedstabiliteten er ikke truet. Klatring er trygt, men ikke belast selve skadestedet.`;
                 }
 
                 // 2. Beregn Restlevetid (Forenklet: 1.5mm råtehastighet per år)
