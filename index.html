@@ -102,6 +102,14 @@
             <div class="bg-amber-50/50 p-4 rounded-lg border border-amber-200">
                 <h2 class="text-xs font-semibold text-amber-800 uppercase tracking-wider mb-3 border-b border-amber-200 pb-1">3. Tilstandskontroll (Innvendig Råte)</h2>
                 
+                <div class="mb-4 bg-white p-3 rounded-md border border-amber-200 shadow-sm">
+                    <h3 class="text-[11px] font-bold text-amber-900 uppercase tracking-wide mb-1">ℹ️ Soneinndeling (Rettledning)</h3>
+                    <p class="text-[11px] text-gray-700 leading-relaxed">
+                        <b class="text-red-700">Sone A (0 – 5 m):</b> Kritisk sone (Knekkpunkt). Skader her påvirker stolpens hovedstabilitet og klatresikkerhet direkte.<br>
+                        <b class="text-green-700">Sone B (> 5 m):</b> Sikker sone. Bøyemomentet er lavt. Hovedstabiliteten er sjelden truet, men selve skadestedet må ikke belastes direkte av montør.
+                    </p>
+                </div>
+
                 <div class="grid grid-cols-2 gap-3 mb-3">
                     <div>
                         <label class="block text-[11px] font-medium text-amber-900 mb-0.5">Stolpediameter på skadested (mm)</label>
@@ -148,161 +156,4 @@
             </div>
 
             <div class="space-y-2">
-                <button type="button" onclick="beregnRestlevetid()" class="w-full bg-green-800 hover:bg-green-900 text-white font-bold py-3 px-4 rounded-lg shadow-lg text-center text-md tracking-wide cursor-pointer transition transform active:scale-95">
-                    BEREGN & GENERER RAPPORT
-                </button>
-                
-                <div class="grid grid-cols-1 gap-2 pt-1">
-                    <button type="button" class="w-full bg-blue-700 hover:bg-blue-800 text-white text-sm font-bold py-2.5 rounded-lg shadow cursor-pointer transition">
-                        💾 LAGRE STOLPE I HISTORIKK
-                    </button>
-                </div>
-                <div class="grid grid-cols-2 gap-2 pt-1">
-                    <button type="button" onclick="window.scrollTo(0,0); location.reload();" class="bg-gray-600 hover:bg-gray-700 text-white text-xs font-bold py-2 rounded shadow cursor-pointer transition">
-                        🔄 NESTE STOLPE
-                    </button>
-                    <button type="button" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2 rounded shadow cursor-pointer transition">
-                        📊 EKSPORTER TIL EXCEL
-                    </button>
-                </div>
-            </div>
-
-            <div id="resultatSeksjon" class="hidden transition-all duration-300">
-                <div id="resultatKort" class="p-6 rounded-xl border text-center space-y-4 shadow-inner">
-                    <h2 class="text-xs font-bold uppercase tracking-widest text-gray-600">E.T. RÅTESJEKK KONKLUSJON</h2>
-                    <div class="grid grid-cols-2 gap-2 max-w-sm mx-auto">
-                        <div class="bg-white/90 p-3 rounded-lg border border-black/10">
-                            <span class="block text-[10px] uppercase font-bold text-gray-500">Restlevetid</span>
-                            <span id="resRestlevetid" class="text-3xl font-black text-gray-900">- år</span>
-                        </div>
-                        <div class="bg-white/90 p-3 rounded-lg border border-black/10">
-                            <span class="block text-[10px] uppercase font-bold text-gray-500">Utskiftingsår</span>
-                            <span id="resUtskiftingsAar" class="text-3xl font-black text-gray-900">-</span>
-                        </div>
-                    </div>
-                    <div class="bg-white/95 p-3.5 rounded-lg text-sm border border-black/5 text-left space-y-1.5 max-w-md mx-auto shadow-inner" id="resKonklusjonBoks">
-                        </div>
-                </div>
-            </div>
-
-        </main>
-    </div>
-
-    <script>
-        // 🔒 START SIKKERHETSLÅS
-        document.addEventListener("DOMContentLoaded", () => {
-            document.addEventListener('contextmenu', event => event.preventDefault());
-            document.addEventListener('copy', event => event.preventDefault());
-
-            const gyldigDomene = "vestmyra16.github.io";
-            if (window.location.hostname !== "" && window.location.hostname !== gyldigDomene) {
-                document.body.innerHTML = ""; 
-                return; 
-            }
-
-            const utlopsDato = new Date("2026-07-13");
-            if (new Date() > utlopsDato) {
-                alert("Testperioden er utløpt.");
-                window.location.href = "about:blank";
-                return;
-            }
-        });
-        // 🔒 SLUTT SIKKERHETSLÅS
-
-        window.onload = () => {
-            document.getElementById('kontrollertAar').value = new Date().getFullYear();
-        };
-
-        function handterBilde(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('bildeVisning').src = e.target.result;
-                    document.getElementById('bildeForhandsvisningSeksjon').classList.remove('hidden');
-                    document.getElementById('bildeTekst').innerText = "✅ Bilde er registrert!";
-                }
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        function oppdaterAlder() {
-            const montert = parseInt(document.getElementById('montertAar').value);
-            const kontrollert = parseInt(document.getElementById('kontrollertAar').value);
-            if (montert && kontrollert) {
-                document.getElementById('alderVisning').innerText = `Aktiv alder ved kontroll: ${kontrollert - montert} år`;
-            } else {
-                document.getElementById('alderVisning').innerText = `Aktiv alder ved kontroll: - år`;
-            }
-        }
-
-        function beregnRestlevetid() {
-            try {
-                const diaRaw = document.getElementById('diameter').value;
-                const skadehoydeRaw = document.getElementById('skadehoyde').value;
-                const restRaw = document.getElementById('maaltRestskall').value;
-                const grenseRaw = document.getElementById('utskiftingGrense').value;
-
-                if (!diaRaw || !skadehoydeRaw || !restRaw || !grenseRaw) {
-                    alert("Vennligst fyll inn verdier for stolpediameter, skadehøyde, utskiftingsgrense og målt restskall før du beregner.");
-                    return;
-                }
-
-                const dia = parseFloat(diaRaw);
-                const skadehoyde = parseFloat(skadehoydeRaw);
-                const restskall = parseFloat(restRaw);
-                const grense = parseFloat(grenseRaw);
-                const kontrollAar = parseInt(document.getElementById('kontrollertAar').value) || new Date().getFullYear();
-
-                // 1. Beregn klatresikkerhet
-                let minSikkerhetsKrav = Math.max(35, dia * 0.1);
-                let sf = (restskall / minSikkerhetsKrav).toFixed(2);
-                let klatreAnbefaling = "";
-
-                if (skadehoyde <= 5.0) {
-                    // SONE A: Kritisk sone (Knekkpunkt)
-                    if (restskall < minSikkerhetsKrav) {
-                        klatreAnbefaling = `<span class="text-red-700 font-black">🔴 KLATRING FRARÅDES (Sone A - SF: ${sf})</span><br>Skade i kritisk sone. Sikkerhetsfaktor under 1.0. Stolpen må forsterkes eller klatres fra lift.`;
-                    } else if (restskall <= minSikkerhetsKrav + 20) {
-                        klatreAnbefaling = `<span class="text-amber-600 font-black">🟡 VURDERINGSSONE (Sone A - SF: ${sf})</span><br>Skade i kritisk sone. Klatring krever skjønn. Sjekk vind, vinkelstrekk og treverkets kvalitet.`;
-                    } else {
-                        klatreAnbefaling = `<span class="text-green-700 font-black">🟢 TRYGG (Sone A - SF: ${sf})</span><br>God sikkerhetsmargin for klatring i kritisk sone under normale forhold.`;
-                    }
-                } else {
-                    // SONE B: Sikker sone (Over 5m)
-                    klatreAnbefaling = `<span class="text-green-700 font-black">🟢 TRYGG (Sone B)</span><br>Skaden er over knekkpunktet (>5m). Hovedstabiliteten er ikke truet. Klatring er trygt, men ikke belast selve skadestedet.`;
-                }
-
-                // 2. Beregn Restlevetid (Forenklet: 1.5mm råtehastighet per år)
-                let levetid = 0;
-                if (restskall > grense) {
-                    levetid = Math.round((restskall - grense) / 1.5);
-                }
-                if (document.getElementById('drypping').checked) {
-                    levetid += 7; // Drypping legger til anslått levetid
-                }
-
-                // 3. Generer output
-                document.getElementById('resRestlevetid').innerText = levetid + " år";
-                document.getElementById('resUtskiftingsAar').innerText = (kontrollAar + levetid) || "-";
-                
-                let vedlikeholdTekst = levetid <= 0 
-                    ? "Stolpen har nådd utskiftingsgrensen og krever utskifting." 
-                    : "Stolpen har restlevetid. Følg opp ved neste rutinekontroll.";
-
-                document.getElementById('resKonklusjonBoks').innerHTML = `
-                    <p class="text-sm"><b>Klatresikkerhet:</b><br>${klatreAnbefaling}</p>
-                    <hr class="my-2 border-gray-300">
-                    <p class="text-sm"><b>Vedlikehold:</b><br>${vedlikeholdTekst}</p>
-                `;
-
-                const resultatSeksjon = document.getElementById('resultatSeksjon');
-                resultatSeksjon.classList.remove('hidden');
-                setTimeout(() => resultatSeksjon.scrollIntoView({ behavior: 'smooth' }), 100);
-
-            } catch (error) {
-                alert("Det oppstod en uventet feil i beregningen. Sjekk at alle tall er fylt ut riktig.");
-            }
-        }
-    </script>
-</body>
-</html>
+                <button type="button" onclick="beregnRestlevetid()" class="w-full bg-green-800 hover:bg-green-900 text-white font-bold py-3 px-4
