@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E.T. – Råtesjekk v13 (Mekanisk)</title>
+    <title>E.T. – Råtesjekk v16 (HMS & Sikkerhet)</title>
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
@@ -12,9 +12,9 @@
 <body class="bg-gray-50 text-gray-800 font-sans min-h-screen">
 
     <div class="max-w-2xl mx-auto px-4 py-6">
-        <header class="bg-green-700 text-white p-5 rounded-t-xl shadow-md text-center flex flex-col items-center justify-center">
-            <h1 class="text-3xl font-black tracking-tighter text-amber-300">E.T.</h1>
-            <p class="text-xs text-green-100 mt-1 uppercase tracking-wider font-bold">Råtesjekk & Bøyemoment – v13</p>
+        <header class="bg-slate-800 text-white p-5 rounded-t-xl shadow-md text-center flex flex-col items-center justify-center border-b-4 border-amber-400">
+            <h1 class="text-3xl font-black tracking-tighter text-amber-400">E.T.</h1>
+            <p class="text-xs text-gray-300 mt-1 uppercase tracking-widest font-bold">Stolpekontroll & HMS-Estimat v16</p>
         </header>
 
         <main class="bg-white p-6 rounded-b-xl shadow-md border-x border-b border-gray-200 space-y-6 overflow-hidden">
@@ -162,8 +162,8 @@
             </div>
 
             <div class="space-y-2">
-                <button onclick="beregnRestlevetid()" class="w-full bg-green-800 hover:bg-green-900 text-white font-bold py-3 px-4 rounded-lg shadow-lg text-center text-md tracking-wide cursor-pointer transition transform active:scale-95">
-                    BEREGN & GENERER RAPPORT
+                <button onclick="beregnRestlevetid()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 px-4 rounded-lg shadow-lg text-center text-md tracking-wide cursor-pointer transition transform active:scale-95 border border-slate-950">
+                    BEREGN SIKKERHETSESTIMAT
                 </button>
                 
                 <div class="grid grid-cols-1 gap-2 pt-1">
@@ -183,21 +183,27 @@
             </div>
 
             <div id="resultatSeksjon" class="hidden transition-all duration-300">
-                <div id="resultatKort" class="p-6 rounded-xl border text-center space-y-4 shadow-inner">
-                    <h2 class="text-xs font-bold uppercase tracking-widest text-gray-600">E.T. KONKLUSJON</h2>
-                    <div class="grid grid-cols-2 gap-2 max-w-sm mx-auto">
-                        <div class="bg-white/90 p-3 rounded-lg border border-black/10 flex flex-col items-center justify-center">
-                            <span class="block text-[10px] uppercase font-bold text-gray-500">Mekanisk Styrke</span>
-                            <span id="resMekaniskStyrke" class="text-xl font-black text-blue-900">- %</span>
+                <div id="resultatKort" class="p-6 rounded-xl border text-center space-y-4 shadow-inner mt-2">
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-gray-600">HMS & TILSTANDSKONKLUSJON</h2>
+                    
+                    <div class="bg-white p-3 rounded-lg border shadow-sm max-w-sm mx-auto my-2" id="hmsVarselKort">
+                        <span class="block text-[11px] uppercase font-bold text-gray-500 mb-1">Klatrestatus</span>
+                        <span id="resHmsStatus" class="text-lg font-black tracking-wide block">-</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 max-w-md mx-auto">
+                        <div id="sfKort" class="p-3 rounded-lg border flex flex-col items-center justify-center shadow-sm">
+                            <span class="block text-[10px] uppercase font-bold text-gray-600">Sikkerhetsfaktor</span>
+                            <span id="resSikkerhetsfaktor" class="text-3xl font-black">-</span>
                         </div>
-                        <div class="bg-white/90 p-3 rounded-lg border border-black/10 flex flex-col items-center justify-center">
+                        <div class="bg-white/90 p-3 rounded-lg border border-black/10 flex flex-col items-center justify-center shadow-sm">
                             <span class="block text-[10px] uppercase font-bold text-gray-500">Restlevetid</span>
-                            <span id="resRestlevetid" class="text-3xl font-black text-gray-900">- år</span>
+                            <span id="resRestlevetid" class="text-3xl font-black text-gray-900">-</span>
                         </div>
                     </div>
-                    <div class="bg-white/95 p-3.5 rounded-lg text-sm border border-black/5 text-left space-y-1.5 max-w-md mx-auto shadow-inner">
-                        <p class="text-xs text-gray-700 font-medium" id="resKonklusjonTekst"></p>
-                        <p class="font-bold text-gray-950" id="resNesteKontroll"></p>
+                    
+                    <div class="bg-white/95 p-3.5 rounded-lg text-sm border border-black/5 text-left space-y-1.5 max-w-md mx-auto shadow-inner mt-4">
+                        <p class="text-xs text-gray-800 font-medium" id="resKonklusjonTekst"></p>
                     </div>
                 </div>
             </div>
@@ -207,9 +213,12 @@
 
     <script>
         let bildeBase64 = "";
-        const jordsmonnFaktorData = { fjell: 0.20, jord_pa_fjell: 0.45, myr: 0.45, asfalt: 0.55, dyrka: 0.65 };
         
-        // Sonevekting for bøyemomenttap
+        // Faktorer for nedbrytning
+        const jordsmonnFaktorData = { fjell: 0.20, jord_pa_fjell: 0.45, myr: 0.45, asfalt: 0.55, dyrka: 0.65 };
+        const klimasoneFaktorer = { kyst: 1.2, skog: 1.0, fjell: 0.8 };
+        
+        // Sonevekting for reststyrke tap
         const soneVekting = { "A": 1.0, "B": 0.6, "C": 0.3 };
 
         window.onload = () => {
@@ -257,6 +266,8 @@
             
             const montertAar = parseInt(document.getElementById('montertAar').value);
             const kontrollertAar = parseInt(document.getElementById('kontrollertAar').value) || new Date().getFullYear();
+            const alder = kontrollertAar - montertAar;
+
             const valgtSoneMiljo = document.getElementById('klimasone').value;
             const valgtJord = document.getElementById('jordsmonn').value;
             
@@ -272,8 +283,8 @@
             const maaltRestskall = parseFloat(document.getElementById('maaltRestskall').value);
             const isDryppet = document.getElementById('drypping').checked;
 
-            if (!montertAar || !valgtJord || isNaN(maaltRestskall) || !jordbandDia || !skadeDia || !skadeSoneValgt) {
-                alert("Vennligst fyll ut alle nødvendige felt inkludert Høyde, Jordbånddiameter, Skadested og Skadesone (A/B/C).");
+            if (!montertAar || !valgtSoneMiljo || !valgtJord || isNaN(maaltRestskall) || !jordbandDia || !skadeDia || !skadeSoneValgt) {
+                alert("Vennligst fyll ut alle felter (Alder, Miljø, Dimensjoner og Sone).");
                 return;
             }
 
@@ -282,72 +293,117 @@
                 return;
             }
 
-            // --- BEREGNING 1: Råtebasert restlevetid (Grønn sone) ---
-            const raatefaktor = jordsmonnFaktorData[valgtJord];
+            // --- BEREGNING 1: Råtebasert degradering (Konservativ avrunding) ---
+            const klimasoneFaktor = klimasoneFaktorer[valgtSoneMiljo] || 1.0;
+            const raatefaktor = jordsmonnFaktorData[valgtJord] * klimasoneFaktor;
             const marginIgjenMm = maaltRestskall - utskiftingGrense;
             let baasisRestlevetid = 0;
 
             if (marginIgjenMm > 0) {
-                baasisRestlevetid = (marginIgjenMm / raatefaktor);
+                // Runder NED for å være konservativ på restlevetid
+                baasisRestlevetid = Math.floor(marginIgjenMm / raatefaktor);
             }
 
-            // --- BEREGNING 2: Mekanisk Bøyemoment-tap ---
-            // W er proporsjonal med d^3
-            const reduksjon = Math.pow((skadeDia / jordbandDia), 3); // R = (D_skade / D_original)^3
-            const soneKoeffisient = soneVekting[skadeSoneValgt]; // K_s
-            
-            // Restkapasitet kombinerer tap i diameter med hvor på stolpen skaden er
+            // --- BEREGNING 2: SIKKERHETSFAKTOR (SF) ---
+            const reduksjon = Math.pow((skadeDia / jordbandDia), 3); 
+            const soneKoeffisient = soneVekting[skadeSoneValgt]; 
             const kapasitetstap = (1 - reduksjon) * soneKoeffisient;
-            const restKapasitet = 1 - kapasitetstap; 
-            const restKapasitetProsent = Math.round(restKapasitet * 100);
+            const restStyrkeProsent = Math.round((1 - kapasitetstap) * 100); 
+            
+            // REN-kravet = 75%. SF = Reststyrke / 75
+            const sikkerhetsfaktor = (restStyrkeProsent / 75).toFixed(2);
+            const sfNum = parseFloat(sikkerhetsfaktor);
+            
+            const erKritiskMekanisk = sfNum < 1.00;
+            const erMarginal = sfNum >= 1.00 && sfNum <= 1.15;
 
-            // --- KOMBINERT RESULTAT ---
-            // Vi "straffer" den opprinnelige råte-restlevetiden basert på tapet i strukturell styrke
-            let estimertRestlevetid = Math.round(baasisRestlevetid * restKapasitet);
+            // --- KOMBINERT RESULTAT & TAK ---
+            let estimertRestlevetid = Math.floor(baasisRestlevetid * (restStyrkeProsent / 100));
 
-            if (isDryppet && estimertRestlevetid > 0) {
-                estimertRestlevetid += 7;
+            // Straff for marginale stolper: Har de SF mellom 1.00 og 1.15, halveres teoretisk resttid
+            if (erMarginal) {
+                estimertRestlevetid = Math.floor(estimertRestlevetid / 2);
             }
 
-            // Sikkerhetsbrist: Hvis restkapasiteten er under 50% = Akutt utskifting
-            let erKritiskMekanisk = restKapasitet < 0.50;
+            const maksTeoretiskLevetidRest = Math.max(0, 80 - alder);
+            estimertRestlevetid = Math.min(estimertRestlevetid, maksTeoretiskLevetidRest);
+
+            if (isDryppet && estimertRestlevetid > 0 && !erMarginal) {
+                estimertRestlevetid += 7; // Drypp gir full effekt på ellers friske stolper
+            } else if (isDryppet && estimertRestlevetid > 0 && erMarginal) {
+                estimertRestlevetid += 3; // Konservativt påslag for marginale stolper
+            }
+
+            // Utskiftingsgrense nådd på råte ELLER SF er under 1.0
             if (erKritiskMekanisk || marginIgjenMm <= 0) {
                 estimertRestlevetid = 0;
             }
 
-            const anbefaltUtskiftetAar = kontrollertAar + estimertRestlevetid;
-            let nesteKontrollOmAar = estimertRestlevetid <= 5 ? 2 : (estimertRestlevetid <= 12 ? 5 : 10);
+            // --- VIS RESULTATER & HMS-VARSEL ---
+            document.getElementById('resultatSeksjon').classList.remove('hidden');
+            const resKort = document.getElementById('resultatKort');
+            const hmsVarselKort = document.getElementById('hmsVarselKort');
+            const hmsStatusDisplay = document.getElementById('resHmsStatus');
+            const sfKort = document.getElementById('sfKort');
+            const sfDisplay = document.getElementById('resSikkerhetsfaktor');
+            const levetidDisplay = document.getElementById('resRestlevetid');
+            const resKonklusjonDisplay = document.getElementById('resKonklusjonTekst');
+
+            resKort.className = "p-6 rounded-xl border text-center space-y-4 shadow-inner mt-2 ";
+            sfDisplay.innerText = sikkerhetsfaktor;
+
+            if (estimertRestlevetid === 0) {
+                // RØD SONE - UTSKIFTING
+                resKort.classList.add("bg-red-50", "border-red-200");
+                sfKort.className = "p-3 rounded-lg border flex flex-col items-center justify-center shadow-sm bg-red-100 border-red-300 text-red-900";
+                
+                hmsVarselKort.className = "bg-red-600 text-white p-3 rounded-lg border-2 border-red-800 shadow-md max-w-sm mx-auto my-2 animate-pulse";
+                hmsStatusDisplay.innerText = "⛔ KLATREFORBUD";
+                
+                levetidDisplay.innerText = "UTSKIFTING";
+                levetidDisplay.classList.add("text-red-700", "text-xl"); 
+                
+                let aarsak = erKritiskMekanisk ? `sikkerhetsfaktoren er ${sikkerhetsfaktor}` : `målt restskall er under minstekravet`;
+                resKonklusjonDisplay.innerHTML = `<strong>Kritisk fare:</strong> Stolpen er underkjent fordi ${aarsak}.<br><br><strong>Aksjon:</strong> Stolpen skal rødmerkes og skiftes ut snarest. Ingen klatring.`;
+            
+            } else if (erMarginal) {
+                // GUL SONE - MARGINAL
+                resKort.classList.add("bg-amber-50", "border-amber-200");
+                sfKort.className = "p-3 rounded-lg border flex flex-col items-center justify-center shadow-sm bg-amber-100 border-amber-300 text-amber-900";
+                
+                hmsVarselKort.className = "bg-amber-400 text-amber-950 p-3 rounded-lg border-2 border-amber-600 shadow-md max-w-sm mx-auto my-2";
+                hmsStatusDisplay.innerText = "⚠️ KREVER SIKRING (LIFT/STIGESKO)";
+                
+                levetidDisplay.innerText = `${estimertRestlevetid} år`;
+                levetidDisplay.classList.remove("text-red-700", "text-xl");
+                
+                resKonklusjonDisplay.innerHTML = `<strong>Advarsel:</strong> Sikkerhetsfaktoren er marginal (${sikkerhetsfaktor}). Nedbrytningstakt forventes å akselerere. Klatring skal kun skje med ekstra sikring. Vurderes skiftet ved neste revisjon.`;
+                
+            } else {
+                // GRØNN SONE - GODKJENT
+                resKort.classList.add("bg-slate-50", "border-slate-200");
+                sfKort.className = "p-3 rounded-lg border flex flex-col items-center justify-center shadow-sm bg-green-100 border-green-300 text-green-800";
+                
+                hmsVarselKort.className = "bg-green-600 text-white p-3 rounded-lg border-2 border-green-800 shadow-sm max-w-sm mx-auto my-2";
+                hmsStatusDisplay.innerText = "✅ KLATREKLAR";
+
+                levetidDisplay.innerText = `${estimertRestlevetid} år`;
+                levetidDisplay.classList.remove("text-red-700", "text-xl");
+                
+                resKonklusjonDisplay.innerHTML = `Sikkerhetsmarginen er tilfredsstillende (SF ${sikkerhetsfaktor}). Estimatet gir stolpen ${estimertRestlevetid} år gjenværende levetid.`;
+            }
 
             // Lagre til minne
             sisteKalkulasjon = { 
                 netteier, linjeId, mastepunktNr, stolpeNr, montertAar, kontrollertAar, 
                 klimasone: valgtSoneMiljo, jordsmonn: valgtJord, 
-                stolpeHoyde, jordbandDia, skadeDia, skadeSone: skadeSoneValgt, restKapasitetProsent,
-                maaltRestskall, utskiftingGrense, estimertRestlevetid, anbefaltUtskiftetAar 
+                stolpeHoyde, jordbandDia, skadeDia, skadeSone: skadeSoneValgt, sikkerhetsfaktor,
+                maaltRestskall, utskiftingGrense, estimertRestlevetid, klatrestatus: hmsStatusDisplay.innerText 
             };
-
-            // Vis Resultater
-            document.getElementById('resultatSeksjon').classList.remove('hidden');
-            document.getElementById('resMekaniskStyrke').innerText = `${restKapasitetProsent} %`;
-            document.getElementById('resRestlevetid').innerText = `${estimertRestlevetid} år`;
-
-            const resKort = document.getElementById('resultatKort');
-            resKort.className = "p-6 rounded-xl border text-center space-y-4 shadow-inner ";
-
-            if (estimertRestlevetid === 0) {
-                resKort.classList.add("bg-red-100", "border-red-300", "text-red-950");
-                let aarsak = erKritiskMekanisk ? `mekanisk reststyrke er kritisk lav (${restKapasitetProsent}%)` : `målt restskall er under utskiftingsgrensen`;
-                document.getElementById('resKonklusjonTekst').innerText = `Stolpe ${stolpeNr} på mast ${mastepunktNr} har nådd sikkerhetsgrensen fordi ${aarsak}.`;
-                document.getElementById('resNesteKontroll').innerText = "TILTAK: Må rødmerkes og skiftes ut snarest!";
-            } else {
-                resKort.classList.add(estimertRestlevetid <= 8 ? "bg-amber-100" : "bg-green-100", "text-gray-900");
-                document.getElementById('resKonklusjonTekst').innerText = `Stolpen har tilfredsstillende margin. Bøyekapasiteten er beregnet til ${restKapasitetProsent}%. ${isDryppet ? 'Drypping forlenget levetiden.' : ''}`;
-                document.getElementById('resNesteKontroll').innerText = `Neste obligatoriske kontroll: Om ${nesteKontrollOmAar} år (${kontrollertAar + nesteKontrollOmAar}).`;
-            }
         }
 
         function lagreTilLokaltMinne() {
-            if (!sisteKalkulasjon) { alert("Vennligst trykk 'BEREGN' før du lagrer."); return; }
+            if (!sisteKalkulasjon) { alert("Vennligst beregn estimat før du lagrer."); return; }
             let historikk = JSON.parse(localStorage.getItem('et_historikk') || '[]');
             historikk.push({...sisteKalkulasjon, bilde: bildeBase64 ? "Ja" : "Nei", dato: new Date().toLocaleDateString()});
             localStorage.setItem('et_historikk', JSON.stringify(historikk));
@@ -372,6 +428,7 @@
             document.getElementById('bildeForhandsvisningSeksjon').classList.add('hidden');
             document.getElementById('bildeTekst').innerText = "📷 Ta eller velg bilde";
             document.getElementById('resultatSeksjon').classList.add('hidden');
+            document.getElementById('alderVisning').innerText = "Aktiv alder ved kontroll: - år";
             
             sisteKalkulasjon = null;
             localStorage.setItem('mastepunktNr', '');
@@ -386,17 +443,17 @@
             if (historikk.length === 0) { alert("Ingen lagrede data. Lagre en stolpe først."); return; }
 
             let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
-            csvContent += "Dato;Netteier;LinjeID;MastepunktNr;StolpeNr;Alder;Klimasone;Jordsmonn;Hoyde(m);JordbandDia(mm);SkadestedDia(mm);SkadeSone;MekaniskStyrke(%);MaaltRestskall(mm);Grense(mm);Restlevetid(aar);Utskiftingsaar\r\n";
+            csvContent += "Dato;Netteier;LinjeID;MastepunktNr;StolpeNr;Alder;Klimasone;Jordsmonn;Hoyde(m);JordbandDia(mm);SkadestedDia(mm);SkadeSone;MaaltRestskall(mm);Grense(mm);Sikkerhetsfaktor;Restlevetid(aar);Klatrestatus\r\n";
 
             historikk.forEach(h => {
                 let alder = h.kontrollertAar - h.montertAar;
-                csvContent += `${h.dato||''};${h.netteier};${h.linjeId};${h.mastepunktNr};${h.stolpeNr};${alder};${h.klimasone};${h.jordsmonn};${h.stolpeHoyde||''};${h.jordbandDia||''};${h.skadeDia||''};${h.skadeSone||''};${h.restKapasitetProsent||''};${h.maaltRestskall};${h.utskiftingGrense};${h.estimertRestlevetid};${h.anbefaltUtskiftetAar}\r\n`;
+                csvContent += `${h.dato||''};${h.netteier};${h.linjeId};${h.mastepunktNr};${h.stolpeNr};${alder};${h.klimasone};${h.jordsmonn};${h.stolpeHoyde||''};${h.jordbandDia||''};${h.skadeDia||''};${h.skadeSone||''};${h.maaltRestskall};${h.utskiftingGrense};${h.sikkerhetsfaktor||''};${h.estimertRestlevetid};${h.klatrestatus||''}\r\n`;
             });
 
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `ET_Mekanisk_v13_${new Date().toLocaleDateString()}.csv`);
+            link.setAttribute("download", `ET_HMS_v16_${new Date().toLocaleDateString()}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
