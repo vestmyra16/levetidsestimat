@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>E.T. – Råtesjekk v12</title>
-    
     <meta name="author" content="E.T. og Sprekkanalyse - Opphavsrett 2026">
-    
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
@@ -14,10 +12,7 @@
 
     <style>
         /* Sikkerhetslås for stil */
-        body {
-            -webkit-user-select: none;
-            user-select: none;
-        }
+        body { -webkit-user-select: none; user-select: none; }
         /* Vannmerke */
         .vannmerke {
             position: fixed; top: 10px; right: 10px; z-index: 9999;
@@ -31,7 +26,7 @@
 
     <div class="max-w-2xl mx-auto px-4 py-6">
         <header class="bg-green-700 text-white p-5 rounded-t-xl shadow-md text-center flex flex-col items-center justify-center">
-            <img src="icon.png" alt="E.T. Råtesjekk" class="w-24 h-24 mb-3 rounded-xl shadow-md">
+            <img src="icon.png" alt="E.T. Råtesjekk" class="w-24 h-24 mb-3 rounded-xl shadow-md" onerror="this.style.display='none'">
             <h1 class="text-3xl font-black tracking-tighter text-amber-300">E.T.</h1>
             <p class="text-xs text-green-100 mt-1 uppercase tracking-wider font-bold">Råtesjekk – Sone- & Restlevetidskalkulator</p>
         </header>
@@ -70,11 +65,11 @@
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="block text-[11px] font-medium text-gray-600 mb-0.5">Monteringsår</label>
-                            <input type="number" id="montertAar" placeholder="1985" class="w-full p-2.5 border rounded bg-white text-sm" onchange="oppdaterAlder()">
+                            <input type="number" id="montertAar" placeholder="Eks. 1980" class="w-full p-2.5 border rounded bg-white text-sm" oninput="oppdaterAlder()">
                         </div>
                         <div>
                             <label class="block text-[11px] font-medium text-gray-600 mb-0.5">Kontrollår</label>
-                            <input type="number" id="kontrollertAar" class="w-full p-2.5 border rounded bg-white text-sm" onchange="oppdaterAlder()">
+                            <input type="number" id="kontrollertAar" class="w-full p-2.5 border rounded bg-white text-sm" oninput="oppdaterAlder()">
                         </div>
                     </div>
                     
@@ -109,7 +104,7 @@
                 
                 <div class="mb-3">
                     <label class="block text-[11px] font-medium text-amber-900 mb-0.5">Stolpediameter i råtesonen (mm)</label>
-                    <input type="number" id="diameter" placeholder="Eks. 280" class="w-full p-2 border border-amber-300 rounded bg-white text-lg font-black text-center text-amber-900">
+                    <input type="number" id="diameter" placeholder="Eks. 350" class="w-full p-2 border border-amber-300 rounded bg-white text-lg font-black text-center text-amber-900">
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
@@ -147,20 +142,20 @@
             </div>
 
             <div class="space-y-2">
-                <button onclick="beregnRestlevetid()" class="w-full bg-green-800 hover:bg-green-900 text-white font-bold py-3 px-4 rounded-lg shadow-lg text-center text-md tracking-wide cursor-pointer transition transform active:scale-95">
+                <button type="button" onclick="beregnRestlevetid()" class="w-full bg-green-800 hover:bg-green-900 text-white font-bold py-3 px-4 rounded-lg shadow-lg text-center text-md tracking-wide cursor-pointer transition transform active:scale-95">
                     BEREGN & GENERER RAPPORT
                 </button>
                 
                 <div class="grid grid-cols-1 gap-2 pt-1">
-                    <button class="w-full bg-blue-700 hover:bg-blue-800 text-white text-sm font-bold py-2.5 rounded-lg shadow cursor-pointer transition">
+                    <button type="button" class="w-full bg-blue-700 hover:bg-blue-800 text-white text-sm font-bold py-2.5 rounded-lg shadow cursor-pointer transition">
                         💾 LAGRE STOLPE I HISTORIKK
                     </button>
                 </div>
                 <div class="grid grid-cols-2 gap-2 pt-1">
-                    <button onclick="window.scrollTo(0,0); location.reload();" class="bg-gray-600 hover:bg-gray-700 text-white text-xs font-bold py-2 rounded shadow cursor-pointer transition">
+                    <button type="button" onclick="window.scrollTo(0,0); location.reload();" class="bg-gray-600 hover:bg-gray-700 text-white text-xs font-bold py-2 rounded shadow cursor-pointer transition">
                         🔄 NESTE STOLPE
                     </button>
-                    <button class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2 rounded shadow cursor-pointer transition">
+                    <button type="button" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2 rounded shadow cursor-pointer transition">
                         📊 EKSPORTER TIL EXCEL
                     </button>
                 </div>
@@ -229,46 +224,71 @@
             const kontrollert = parseInt(document.getElementById('kontrollertAar').value);
             if (montert && kontrollert) {
                 document.getElementById('alderVisning').innerText = `Aktiv alder ved kontroll: ${kontrollert - montert} år`;
+            } else {
+                document.getElementById('alderVisning').innerText = `Aktiv alder ved kontroll: - år`;
             }
         }
 
         function beregnRestlevetid() {
-            const dia = parseFloat(document.getElementById('diameter').value);
-            const restskall = parseFloat(document.getElementById('maaltRestskall').value);
-            const grense = parseFloat(document.getElementById('utskiftingGrense').value);
-            const kontrollAar = parseInt(document.getElementById('kontrollertAar').value);
-            
-            if (isNaN(dia) || isNaN(restskall) || isNaN(grense)) {
-                alert("Vennligst fyll ut diameter, utskiftingsgrense og målt restskall.");
-                return;
-            }
+            try {
+                const diaRaw = document.getElementById('diameter').value;
+                const restRaw = document.getElementById('maaltRestskall').value;
+                const grenseRaw = document.getElementById('utskiftingGrense').value;
 
-            // 1. Beregn klatresikkerhet (10% regel eller 35mm absolutt minimum)
-            let minSikkerhetsKrav = Math.max(35, dia * 0.1);
-            let sf = (restskall / minSikkerhetsKrav).toFixed(2);
-            let klatreAnbefaling = "";
+                if (!diaRaw || !restRaw || !grenseRaw) {
+                    alert("Vennligst fyll inn verdier for stolpediameter, utskiftingsgrense og målt restskall før du beregner.");
+                    return;
+                }
 
-            if (restskall < minSikkerhetsKrav) {
-                klatreAnbefaling = `<span class="text-red-700 font-black">🔴 KLATRING FRARÅDES (SF: ${sf})</span><br>Sikkerhetsfaktor er for lav. Vurder stolpeforsterkning eller bruk lift.`;
-            } else if (restskall <= minSikkerhetsKrav + 20) {
-                klatreAnbefaling = `<span class="text-amber-600 font-black">🟡 VURDERINGSSONE (SF: ${sf})</span><br>Klatring krever skjønn. Sjekk vind, vinkelstrekk og treverkets kvalitet.`;
-            } else {
-                klatreAnbefaling = `<span class="text-green-700 font-black">🟢 TRYGG (SF: ${sf})</span><br>God sikkerhetsmargin for klatring under normale forhold.`;
-            }
+                const dia = parseFloat(diaRaw);
+                const restskall = parseFloat(restRaw);
+                const grense = parseFloat(grenseRaw);
+                const kontrollAar = parseInt(document.getElementById('kontrollertAar').value) || new Date().getFullYear();
 
-            // 2. Beregn Restlevetid (Forenklet: 1.5mm råtehastighet per år)
-            let levetid = 0;
-            if (restskall > grense) {
-                levetid = Math.round((restskall - grense) / 1.5);
-            }
-            if (document.getElementById('drypping').checked) {
-                levetid += 7; // Drypping legger til anslått levetid
-            }
+                // 1. Beregn klatresikkerhet (10% regel eller 35mm absolutt minimum)
+                let minSikkerhetsKrav = Math.max(35, dia * 0.1);
+                let sf = (restskall / minSikkerhetsKrav).toFixed(2);
+                let klatreAnbefaling = "";
 
-            // 3. Generer output
-            document.getElementById('resRestlevetid').innerText = levetid + " år";
-            document.getElementById('resUtskiftingsAar').innerText = (kontrollAar + levetid) || "-";
-            
-            let vedlikeholdTekst = levetid <= 0 
-                ? "Stolpen har nådd utskiftingsgrensen og krever tiltak." 
-                : "Stolpen har restlevetid. Følg opp ved neste rutine
+                if (restskall < minSikkerhetsKrav) {
+                    klatreAnbefaling = `<span class="text-red-700 font-black">🔴 KLATRING FRARÅDES (SF: ${sf})</span><br>Sikkerhetsfaktor er under 1.0. Stolpen må forsterkes eller klatres fra lift.`;
+                } else if (restskall <= minSikkerhetsKrav + 20) {
+                    klatreAnbefaling = `<span class="text-amber-600 font-black">🟡 VURDERINGSSONE (SF: ${sf})</span><br>Klatring krever skjønn. Sjekk vind, vinkelstrekk og treverkets kvalitet.`;
+                } else {
+                    klatreAnbefaling = `<span class="text-green-700 font-black">🟢 TRYGG (SF: ${sf})</span><br>God sikkerhetsmargin for klatring under normale forhold.`;
+                }
+
+                // 2. Beregn Restlevetid (Forenklet: 1.5mm råtehastighet per år)
+                let levetid = 0;
+                if (restskall > grense) {
+                    levetid = Math.round((restskall - grense) / 1.5);
+                }
+                if (document.getElementById('drypping').checked) {
+                    levetid += 7; // Drypping legger til anslått levetid
+                }
+
+                // 3. Generer output
+                document.getElementById('resRestlevetid').innerText = levetid + " år";
+                document.getElementById('resUtskiftingsAar').innerText = (kontrollAar + levetid) || "-";
+                
+                let vedlikeholdTekst = levetid <= 0 
+                    ? "Stolpen har nådd utskiftingsgrensen og krever utskifting." 
+                    : "Stolpen har restlevetid. Følg opp ved neste rutinekontroll.";
+
+                document.getElementById('resKonklusjonBoks').innerHTML = `
+                    <p class="text-sm"><b>Klatresikkerhet:</b><br>${klatreAnbefaling}</p>
+                    <hr class="my-2 border-gray-300">
+                    <p class="text-sm"><b>Vedlikehold:</b><br>${vedlikeholdTekst}</p>
+                `;
+
+                const resultatSeksjon = document.getElementById('resultatSeksjon');
+                resultatSeksjon.classList.remove('hidden');
+                setTimeout(() => resultatSeksjon.scrollIntoView({ behavior: 'smooth' }), 100);
+
+            } catch (error) {
+                alert("Det oppstod en uventet feil i beregningen. Sjekk at alle tall er fylt ut riktig.");
+            }
+        }
+    </script>
+</body>
+</html>
