@@ -11,9 +11,7 @@
     <link rel="manifest" href="manifest.json">
 
     <style>
-        /* Sikkerhetslås for stil */
         body { -webkit-user-select: none; user-select: none; }
-        /* Vannmerke */
         .vannmerke {
             position: fixed; top: 10px; right: 10px; z-index: 9999;
             font-size: 10px; color: rgba(0,0,0,0.1); pointer-events: none;
@@ -168,19 +166,31 @@
             </div>
 
             <div id="resultatSeksjon" class="hidden transition-all duration-300 mt-4">
-                <div id="resultatKort" class="p-6 rounded-xl border text-center space-y-4 shadow-inner">
+                <div id="resultatKort" class="p-6 rounded-xl border text-center space-y-4 shadow-inner bg-white">
                     <h2 class="text-xs font-bold uppercase tracking-widest text-gray-600">E.T. RÅTESJEKK KONKLUSJON</h2>
                     <div class="grid grid-cols-2 gap-2 max-w-sm mx-auto">
-                        <div class="bg-white/90 p-3 rounded-lg border border-black/10">
+                        <div class="bg-gray-50 p-3 rounded-lg border border-black/10">
                             <span class="block text-[10px] uppercase font-bold text-gray-500">Restlevetid</span>
                             <span id="resRestlevetid" class="text-3xl font-black text-gray-900">- år</span>
                         </div>
-                        <div class="bg-white/90 p-3 rounded-lg border border-black/10">
+                        <div class="bg-gray-50 p-3 rounded-lg border border-black/10">
                             <span class="block text-[10px] uppercase font-bold text-gray-500">Sikkerhetsfaktor</span>
                             <span id="resSF" class="text-3xl font-black text-blue-900">-</span>
                         </div>
                     </div>
-                    <div class="bg-white/95 p-3.5 rounded-lg text-sm border border-black/5 text-left space-y-1.5 max-w-md mx-auto shadow-inner" id="resKonklusjonBoks">
+                    
+                    <div class="my-4 bg-gray-50 p-4 rounded-lg border border-gray-200 flex flex-col items-center">
+                        <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3">Dynamisk Tverrsnitt</h3>
+                        <canvas id="tverrsnittCanvas" width="240" height="240" class="max-w-full"></canvas>
+                        <div class="flex flex-wrap justify-center gap-x-4 gap-y-2 text-[9px] mt-4 font-bold text-gray-600 uppercase">
+                            <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full" id="fargeFrisk"></span> Friskt Skall</span>
+                            <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-gray-800"></span> Indre Råte</span>
+                            <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full border border-dashed border-gray-400"></span> Opprinnelig Dia</span>
+                            <span class="flex items-center gap-1"><span class="w-3 h-0 border-t-2 border-dashed border-red-500"></span> Minstekrav Klatring</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 p-3.5 rounded-lg text-sm border border-black/5 text-left space-y-1.5 max-w-md mx-auto" id="resKonklusjonBoks">
                     </div>
                 </div>
             </div>
@@ -210,6 +220,71 @@
             document.getElementById('alderVisning').innerText = (m && k) ? `Aktiv alder ved kontroll: ${k - m} år` : `Aktiv alder ved kontroll: - år`;
         }
 
+        // --- TEGNEFUNKSJON FOR TVERRSNITT ---
+        function tegnTverrsnitt(opprinneligDia, effDia, effRestskall, sf, sone, minSikkerhetsKrav) {
+            const canvas = document.getElementById('tverrsnittCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+            const maxR = 110; // Plass til margin
+            const scale = maxR / (opprinneligDia / 2);
+
+            const rOpprinnelig = (opprinneligDia / 2) * scale;
+            const rEffektiv = (effDia / 2) * scale;
+            const rKjerne = Math.max(0, (effDia / 2) - effRestskall) * scale;
+            const rMinKrav = Math.max(0, (effDia / 2) - minSikkerhetsKrav) * scale;
+
+            // Farge basert på sikkerhet (Grønn, Gul, Rød)
+            let farge = '#d97706'; // Standard Amber (Vurdering)
+            if (sf < 1.0 && sone <= 5.0) farge = '#dc2626'; // Rød (Farlig)
+            else if (sf >= 1.0 || sone > 5.0) farge = '#16a34a'; // Grønn (Trygg)
+            
+            document.getElementById('fargeFrisk').style.backgroundColor = farge;
+
+            // 1. Opprinnelig diameter (Stiplet grå ring for å vise værtært/softråte tap)
+            ctx.beginPath();
+            ctx.arc(cx, cy, rOpprinnelig, 0, 2 * Math.PI);
+            ctx.strokeStyle = '#9ca3af';
+            ctx.setLineDash([4, 4]);
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // 2. Friskt treverk
+            ctx.beginPath();
+            ctx.arc(cx, cy, rEffektiv, 0, 2 * Math.PI);
+            ctx.fillStyle = farge;
+            ctx.fill();
+
+            // 3. Råtekjerne (Svart/Mørk grå)
+            ctx.beginPath();
+            ctx.arc(cx, cy, rKjerne, 0, 2 * Math.PI);
+            ctx.fillStyle = '#1f2937';
+            ctx.fill();
+
+            // 4. Den Røde Faregrensen (Minstekrav for klatring i Sone A)
+            if (sone <= 5.0) {
+                ctx.beginPath();
+                ctx.arc(cx, cy, rMinKrav, 0, 2 * Math.PI);
+                ctx.strokeStyle = '#ef4444';
+                ctx.setLineDash([3, 3]);
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+
+            // Tekst i midten
+            if (rKjerne > 20) {
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 10px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('RÅTE', cx, cy);
+            }
+        }
+
         function beregnRestlevetid() {
             try {
                 const diaRaw = document.getElementById('diameter').value;
@@ -227,20 +302,16 @@
                 let restskall = parseFloat(restRaw);
                 const grense = parseFloat(grenseRaw);
                 
-                // --- NY LOGIKK FOR VALGBAR YTRE SVEKKELSE ---
                 const vaertaertDybde = parseFloat(document.getElementById('vaertaert').value) || 0;
                 const softraate = parseFloat(document.getElementById('softraate').value) || 0;
 
                 let effektivtRestskall = restskall;
                 let effektivDiameter = dia;
 
-                // Fratrekk for værtært (1-sidig reduksjon av skall og diameter)
                 if (vaertaertDybde > 0) {
                     effektivtRestskall -= vaertaertDybde;
                     effektivDiameter -= vaertaertDybde;
                 }
-                
-                // Fratrekk for softråte (Rundtgående reduksjon - dobbel på diameter)
                 if (softraate > 0) {
                     effektivtRestskall -= softraate;
                     effektivDiameter -= (softraate * 2);
@@ -249,14 +320,13 @@
                 effektivtRestskall = Math.max(0, effektivtRestskall);
                 effektivDiameter = Math.max(0, effektivDiameter);
 
-                // --- KLATRESIKKERHET (SF) ---
                 let minSikkerhetsKrav = Math.max(35, effektivDiameter * 0.1);
                 let sf = (effektivtRestskall / minSikkerhetsKrav).toFixed(2);
                 let klatreAnbefaling = "";
 
                 if (skadehoyde <= 5.0) {
                     if (effektivtRestskall < minSikkerhetsKrav) {
-                        klatreAnbefaling = `<span class="text-red-700 font-black">🔴 KLATRING FRARÅDES (Sone A)</span><br>Sikkerhetsfaktor under 1.0 pga. for tynt friskt skall. Forsterk stolpen.`;
+                        klatreAnbefaling = `<span class="text-red-700 font-black">🔴 KLATREFORBUD (Sone A)</span><br>Sikkerhetsfaktor under 1.0 pga. for tynt friskt skall. Forsterk stolpen.`;
                     } else if (effektivtRestskall <= minSikkerhetsKrav + 15) {
                         klatreAnbefaling = `<span class="text-amber-600 font-black">🟡 VURDERINGSSONE (Sone A)</span><br>Klatring krever skjønn. Sjekk vind og spenning i stolpen.`;
                     } else {
@@ -266,7 +336,6 @@
                     klatreAnbefaling = `<span class="text-green-700 font-black">🟢 TRYGG (Sone B)</span><br>Skade over 5m. Hovedstabilitet ikke truet. Belast ikke selve skaden direkte.`;
                 }
 
-                // Restlevetid
                 let levetid = effektivtRestskall > grense ? Math.round((effektivtRestskall - grense) / 1.5) : 0;
                 
                 document.getElementById('resRestlevetid').innerText = levetid + " år";
@@ -275,7 +344,7 @@
                 let vedlikehold = levetid <= 0 ? "Nådd utskiftingsgrense. Krever tiltak." : "Følg opp ved neste kontroll.";
 
                 let samletStraff = vaertaertDybde + softraate;
-                let advarsel = samletStraff > 0 ? `<br><span class="text-xs text-red-600 font-bold">* SF er justert ned pga. ytre svekkelse. Effektivt restskall brukt i beregning: ${effektivtRestskall} mm.</span>` : "";
+                let advarsel = samletStraff > 0 ? `<br><span class="text-xs text-red-600 font-bold">* SF er justert ned pga. ytre svekkelse. Effektivt restskall i beregning: ${effektivtRestskall} mm.</span>` : "";
 
                 document.getElementById('resKonklusjonBoks').innerHTML = `
                     <p class="text-sm"><b>Klatresikkerhet:</b><br>${klatreAnbefaling}</p>
@@ -284,8 +353,11 @@
                     ${advarsel}
                 `;
 
+                // Tegn visualiseringen!
+                tegnTverrsnitt(dia, effektivDiameter, effektivtRestskall, sf, skadehoyde, minSikkerhetsKrav);
+
                 document.getElementById('resultatSeksjon').classList.remove('hidden');
-                document.getElementById('resultatSeksjon').scrollIntoView({ behavior: 'smooth' });
+                setTimeout(() => document.getElementById('resultatSeksjon').scrollIntoView({ behavior: 'smooth' }), 100);
 
             } catch (e) {
                 alert("Feil i beregning.");
