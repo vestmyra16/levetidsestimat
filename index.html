@@ -11,7 +11,9 @@
     <link rel="manifest" href="manifest.json">
 
     <style>
+        /* Sikkerhetslås for stil */
         body { -webkit-user-select: none; user-select: none; }
+        /* Vannmerke */
         .vannmerke {
             position: fixed; top: 10px; right: 10px; z-index: 9999;
             font-size: 10px; color: rgba(0,0,0,0.1); pointer-events: none;
@@ -122,19 +124,20 @@
                 <div class="bg-white p-3 rounded border border-amber-200 mb-4 space-y-3 shadow-sm">
                     <h3 class="text-[11px] font-bold text-amber-900 uppercase tracking-wide border-b border-amber-100 pb-1">Ytre Svekkelse (Reduserer effektivt restskall)</h3>
                     
-                    <label class="relative flex items-start cursor-pointer select-none">
-                        <div class="flex items-center h-5">
-                            <input type="checkbox" id="vaertaert" class="w-4 h-4 text-amber-600 bg-gray-100 border-gray-300 rounded focus:ring-amber-500">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-800 mb-0.5">Værtært / Ytre slitasje (1-sidig)</label>
+                            <select id="vaertaert" class="w-full p-2 border border-amber-300 rounded bg-gray-50 text-xs font-semibold">
+                                <option value="0">Ingen synlig værhud (0 mm)</option>
+                                <option value="5">Lett værslitasje (5 mm)</option>
+                                <option value="10">Moderat værslitasje (10 mm)</option>
+                                <option value="15">Kraftig værslitasje (15 mm)</option>
+                            </select>
                         </div>
-                        <div class="ml-2 text-xs">
-                            <span class="font-bold text-gray-800">Værtært / Ytre slitasje (1-sidig)</span>
-                            <p class="text-gray-500 text-[10px]">Trekker sjablongmessig fra 10 mm på effektivt restskall.</p>
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-800 mb-0.5">Målt ytre softråte dybde (mm)</label>
+                            <input type="number" id="softraate" placeholder="0" class="w-full p-2 border border-amber-300 rounded bg-gray-50 text-xs text-center font-semibold">
                         </div>
-                    </label>
-
-                    <div>
-                        <label class="block text-[11px] font-bold text-gray-800 mb-0.5">Målt ytre softråte dybde (mm)</label>
-                        <input type="number" id="softraate" placeholder="0" class="w-1/2 p-2 border border-amber-300 rounded bg-gray-50 text-sm text-center">
                     </div>
                 </div>
 
@@ -224,23 +227,25 @@
                 let restskall = parseFloat(restRaw);
                 const grense = parseFloat(grenseRaw);
                 
-                // --- NY LOGIKK FOR YTRE SVEKKELSE ---
-                const erVaertaert = document.getElementById('vaertaert').checked;
+                // --- NY LOGIKK FOR VALGBAR YTRE SVEKKELSE ---
+                const vaertaertDybde = parseFloat(document.getElementById('vaertaert').value) || 0;
                 const softraate = parseFloat(document.getElementById('softraate').value) || 0;
 
                 let effektivtRestskall = restskall;
                 let effektivDiameter = dia;
 
-                if (erVaertaert) {
-                    effektivtRestskall -= 10;
-                    effektivDiameter -= 10;
+                // Fratrekk for værtært (1-sidig reduksjon av skall og diameter)
+                if (vaertaertDybde > 0) {
+                    effektivtRestskall -= vaertaertDybde;
+                    effektivDiameter -= vaertaertDybde;
                 }
+                
+                // Fratrekk for softråte (Rundtgående reduksjon - dobbel på diameter)
                 if (softraate > 0) {
                     effektivtRestskall -= softraate;
-                    effektivDiameter -= (softraate * 2); // Reduserer tverrsnitt på begge sider
+                    effektivDiameter -= (softraate * 2);
                 }
 
-                // Sikre at vi ikke får negative verdier for beregningen
                 effektivtRestskall = Math.max(0, effektivtRestskall);
                 effektivDiameter = Math.max(0, effektivDiameter);
 
@@ -269,7 +274,8 @@
                 
                 let vedlikehold = levetid <= 0 ? "Nådd utskiftingsgrense. Krever tiltak." : "Følg opp ved neste kontroll.";
 
-                let advarsel = (erVaertaert || softraate > 0) ? `<br><span class="text-xs text-red-600 font-bold">* SF er justert ned pga. ytre svekkelse (værtært/softråte). Effektivt restskall brukt i beregning: ${effektivtRestskall} mm.</span>` : "";
+                let samletStraff = vaertaertDybde + softraate;
+                let advarsel = samletStraff > 0 ? `<br><span class="text-xs text-red-600 font-bold">* SF er justert ned pga. ytre svekkelse. Effektivt restskall brukt i beregning: ${effektivtRestskall} mm.</span>` : "";
 
                 document.getElementById('resKonklusjonBoks').innerHTML = `
                     <p class="text-sm"><b>Klatresikkerhet:</b><br>${klatreAnbefaling}</p>
