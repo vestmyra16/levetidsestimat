@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E.T. – Råtesjekk v13</title>
+    <title>E.T. – Råtesjekk v13.5</title>
     <meta name="author" content="E.T. og Sprekkanalyse - Opphavsrett 2026">
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
@@ -13,10 +13,16 @@
     <style>
         /* Sikkerhetslås for stil */
         body { -webkit-user-select: none; user-select: none; }
-        /* Vannmerke */
         .vannmerke {
             position: fixed; top: 10px; right: 10px; z-index: 9999;
             font-size: 10px; color: rgba(0,0,0,0.1); pointer-events: none;
+        }
+        /* Gjør rapporten print-vennlig (skjuler knapper og inputs ved print/PDF) */
+        @media print {
+            body { -webkit-user-select: auto; user-select: auto; background: white; }
+            .no-print, button, select, input, .vannmerke, header { display: none !important; }
+            #resultatSeksjon { display: block !important; border: none !important; box-shadow: none !important; }
+            .max-w-2xl { max-w: 100% !important; width: 100% !important; padding: 0 !important; }
         }
     </style>
 </head>
@@ -34,7 +40,10 @@
         <main class="bg-white p-6 rounded-b-xl shadow-md border-x border-b border-gray-200 space-y-6 overflow-hidden">
             
             <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 border-b pb-1">1. Grunnlagsdata fra Stolpekontroll</h2>
+                <div class="flex justify-between items-center mb-3 border-b pb-1">
+                    <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">1. Grunnlagsdata fra Stolpekontroll</h2>
+                    <button type="button" onclick="nyttAnlegg()" class="no-print text-[10px] bg-red-100 text-red-700 font-bold px-2 py-0.5 rounded hover:bg-red-200 transition">💥 NYTT ANLEGG</button>
+                </div>
                 <div class="space-y-3">
                     <div class="grid grid-cols-2 gap-3">
                         <div>
@@ -42,7 +51,7 @@
                             <input type="text" id="netteier" class="w-full p-2 border rounded bg-white text-sm">
                         </div>
                         <div>
-                            <label class="block text-[11px] font-medium text-gray-600 mb-0.5">LinjeID</label>
+                            <label class="block text-[11px] font-medium text-gray-600 mb-0.5">LinjeID / Anlegg</label>
                             <input type="text" id="linjeId" class="w-full p-2 border rounded bg-white text-sm">
                         </div>
                     </div>
@@ -59,7 +68,7 @@
                 </div>
             </div>
 
-            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 no-print">
                 <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 border-b pb-1">2. Alder & Soneplassering</h2>
                 <div class="space-y-4">
                     <div class="grid grid-cols-2 gap-3">
@@ -73,46 +82,45 @@
                         </div>
                     </div>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="block text-[11px] font-medium text-gray-600 mb-0.5">Klimasone</label>
                             <select id="klimasone" class="w-full p-2.5 border rounded bg-white text-sm font-medium">
-                                <option value="">-- Velg klimasone --</option>
-                                <option value="kyst">Kystsone / Innmark (0 - 50 moh)</option>
-                                <option value="skog">Skog / Innlandssone (50 - 300 moh)</option>
-                                <option value="fjell">Fjellsone (Over 300 moh)</option>
+                                <option value="">-- Velg --</option>
+                                <option value="kyst">Kystsone</option>
+                                <option value="skog">Inlandsone</option>
+                                <option value="fjell">Fjellsone</option>
                             </select>
                         </div>
                         <div>
                             <label class="block text-[11px] font-medium text-gray-600 mb-0.5">Jordsmonn</label>
                             <select id="jordsmonn" class="w-full p-2.5 border rounded bg-white text-sm font-medium">
-                                <option value="">-- Velg jordsmonn --</option>
-                                <option value="fjell">Fjellfundament</option>
+                                <option value="">-- Velg --</option>
+                                <option value="fjell">Fjell</option>
                                 <option value="jord_pa_fjell">Jord på fjell</option>
-                                <option value="myr">Myr / morene / skogsmark</option>
-                                <option value="asfalt">Asfalt / betong</option>
-                                <option value="dyrka">Dyrka mark</option>
+                                <option value="myr">Myr/Skog</option>
+                                <option value="asfalt">Asfalt</option>
                             </select>
                         </div>
                     </div>
-                    <div class="text-xs text-right mt-1.5 text-gray-500 font-medium" id="alderVisning">Aktiv alder ved kontroll: - år</div>
+                    <div class="text-xs text-right mt-1.5 text-gray-500 font-medium" id="alderVisning">Aktiv alder: - år</div>
                 </div>
             </div>
 
             <div class="bg-amber-50/50 p-4 rounded-lg border border-amber-200">
                 <h2 class="text-xs font-semibold text-amber-800 uppercase tracking-wider mb-3 border-b border-amber-200 pb-1">3. Tilstandskontroll (Råte & Slitasje)</h2>
                 
-                <div class="mb-4 bg-white p-3 rounded-md border border-amber-200 shadow-sm">
+                <div class="mb-4 bg-white p-3 rounded-md border border-amber-200 shadow-sm no-print">
                     <h3 class="text-[11px] font-bold text-amber-900 uppercase tracking-wide mb-1">ℹ️ Soneinndeling</h3>
                     <p class="text-[11px] text-gray-700 leading-relaxed">
-                        <b class="text-red-700">Sone A (0 – 5 m):</b> Kritisk sone (Knekkpunkt). Skader her påvirker stabilitet og klatresikkerhet direkte.<br>
-                        <b class="text-green-700">Sone B (> 5 m):</b> Sikker sone. Lavt bøyemoment. Klatring generelt trygt, belast ikke selve skaden.
+                        <b class="text-red-700">Sone A (0 – 5 m):</b> Kritisk sone (Knekkpunkt). Skader her påvirker klatresikkerhet direkte.<br>
+                        <b class="text-green-700">Sone B (> 5 m):</b> Sikker sone. Lavt bøyemoment. Klatring generelt trygt.
                     </p>
                 </div>
 
-                <div class="mb-4">
+                <div class="mb-4 no-print">
                     <label class="block text-[11px] font-bold text-amber-900 uppercase tracking-wide mb-1">Velg Råteforløp / Skadetype</label>
-                    <select id="raatetype" class="w-full p-2.5 border border-amber-300 rounded bg-white text-sm font-black text-amber-950 shadow-sm focus:ring-2 focus:ring-amber-400" onchange="byttRaatetypeSkjema()">
+                    <select id="raatetype" class="w-full p-2.5 border border-amber-300 rounded bg-white text-sm font-black text-amber-950 shadow-sm" onchange="byttRaatetypeSkjema()">
                         <option value="sirkulaer">🔴 Sentrert / Sirkulær Råte</option>
                         <option value="asymmetrisk">🌙 Asymmetrisk Råte (Bananråte / Råtelomme)</option>
                     </select>
@@ -129,16 +137,16 @@
                     </div>
                 </div>
 
-                <div class="bg-white p-3 rounded border border-amber-200 mb-4 space-y-3 shadow-sm">
-                    <h3 class="text-[11px] font-bold text-amber-900 uppercase tracking-wide border-b border-amber-100 pb-1">Ytre Svekkelse (Reduserer effektivt restskall)</h3>
+                <div class="bg-white p-3 rounded border border-amber-200 mb-4 space-y-3 shadow-sm no-print">
+                    <h3 class="text-[11px] font-bold text-amber-900 uppercase tracking-wide border-b border-amber-100 pb-1">Ytre Svekkelse</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-[11px] font-bold text-gray-800 mb-0.5">Værtært / Ytre slitasje (1-sidig)</label>
+                            <label class="block text-[11px] font-bold text-gray-800 mb-0.5">Værtært / Ytre slitasje</label>
                             <select id="vaertaert" class="w-full p-2 border border-amber-300 rounded bg-gray-50 text-xs font-semibold">
-                                <option value="0">Ingen synlig værhud (0 mm)</option>
-                                <option value="5">Lett værslitasje (5 mm)</option>
-                                <option value="10">Moderat værslitasje (10 mm)</option>
-                                <option value="15">Kraftig værslitasje (15 mm)</option>
+                                <option value="0">Ingen (0 mm)</option>
+                                <option value="5">Lett slitasje (5 mm)</option>
+                                <option value="10">Moderat slitasje (10 mm)</option>
+                                <option value="15">Kraftig slitasje (15 mm)</option>
                             </select>
                         </div>
                         <div>
@@ -151,51 +159,68 @@
                 <div id="skjemaSirkulaer" class="grid grid-cols-2 gap-3 border-t border-amber-200/60 pt-3">
                     <div>
                         <label class="block text-[11px] font-medium text-amber-900 mb-0.5">Utskiftingsgrense (mm)</label>
-                        <input type="number" id="utskiftingGrense" value="35" class="w-full p-2 border border-amber-300 rounded bg-white text-lg font-black text-center text-red-900">
+                        <input type="number" id="utskiftingGrense" value="35" class="w-full p-2 border border-amber-300 rounded bg-white text-sm text-center font-bold">
                     </div>
                     <div>
                         <label class="block text-[11px] font-medium text-amber-900 mb-0.5">MÅLT restskall (mm)</label>
-                        <input type="number" id="maaltRestskall" placeholder="Tast inn" class="w-full p-2 border border-amber-400 rounded bg-white text-lg font-black text-center text-blue-950 focus:ring-2 focus:ring-amber-400">
+                        <input type="number" id="maaltRestskall" placeholder="Tast inn" class="w-full p-2 border border-amber-400 rounded bg-white text-lg font-black text-center text-blue-950">
                     </div>
                 </div>
 
                 <div id="skjemaAsymmetrisk" class="hidden space-y-3 border-t border-amber-200/60 pt-3">
                     <div class="grid grid-cols-3 gap-2">
                         <div>
-                            <label class="block text-[10px] font-bold text-amber-900 mb-0.5">Ytterskall foran (mm)</label>
+                            <label class="block text-[10px] font-bold text-amber-900 mb-0.5">Ytterskall (mm)</label>
                             <input type="number" id="ytterskallForan" placeholder="Eks. 35" class="w-full p-2 border border-amber-300 rounded bg-white text-sm font-bold text-center">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-amber-900 mb-0.5">Råtebredde A (mm)</label>
+                            <label class="block text-[10px] font-bold text-amber-900 mb-0.5">Bredde A (mm)</label>
                             <input type="number" id="roteBreddeA" placeholder="Eks. 120" class="w-full p-2 border border-amber-300 rounded bg-white text-sm font-bold text-center">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-amber-900 mb-0.5">Råtedybde til bakkant B (mm)</label>
+                            <label class="block text-[10px] font-bold text-amber-900 mb-0.5">Dybde B (mm)</label>
                             <input type="number" id="roteDybdeB" placeholder="Eks. 160" class="w-full p-2 border border-amber-300 rounded bg-white text-sm font-bold text-center">
                         </div>
                     </div>
                     <input type="hidden" id="utskiftingGrenseAsym" value="35">
                 </div>
-
             </div>
 
-            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-2">
-                <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider border-b pb-1">4. Fotodokumentasjon</h2>
-                <label class="w-full flex flex-col items-center px-4 py-2 bg-white text-gray-700 rounded-lg border shadow-sm tracking-wide uppercase border-blue-200 cursor-pointer hover:bg-blue-50 transition text-xs font-bold">
-                    <span id="bildeTekst">📷 Ta eller velg bilde</span>
-                    <input type="file" accept="image/*" id="stolpeBilde" class="hidden" onchange="handterBilde(this)">
-                </label>
-            </div>
-
-            <div class="space-y-2 pt-2">
+            <div class="space-y-2 pt-2 no-print">
                 <button type="button" onclick="beregnRestlevetid()" class="w-full bg-green-800 hover:bg-green-900 text-white font-bold py-3 px-4 rounded-lg shadow-lg text-center text-md tracking-wide cursor-pointer transition transform active:scale-95">
                     BEREGN & GENERER RAPPORT
                 </button>
+                
+                <div class="grid grid-cols-1 gap-2 pt-1">
+                    <button type="button" onclick="lagreIHistorikk()" class="w-full bg-blue-700 hover:bg-blue-800 text-white text-sm font-bold py-2.5 rounded-lg shadow cursor-pointer transition">
+                        💾 LAGRE STOLPE I HISTORIKK
+                    </button>
+                </div>
+                <div class="grid grid-cols-3 gap-2 pt-1">
+                    <button type="button" onclick="nyMast()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2.5 rounded shadow cursor-pointer transition">
+                        🔄 NY MAST
+                    </button>
+                    <button type="button" onclick="eksporterTilExcel()" class="bg-gray-700 hover:bg-gray-800 text-white text-xs font-bold py-2.5 rounded shadow cursor-pointer transition">
+                        📊 EKSPORTER (EXCEL)
+                    </button>
+                    <button type="button" onclick="window.print()" class="bg-blue-900 hover:bg-blue-950 text-white text-xs font-bold py-2.5 rounded shadow cursor-pointer transition">
+                        🖨️ SKRIV UT / PDF
+                    </button>
+                </div>
+                <div id="historikkTeller" class="text-[11px] text-center text-gray-500 font-medium">Lagrede master i gjeldende økt: 0</div>
             </div>
 
             <div id="resultatSeksjon" class="hidden transition-all duration-300 mt-4">
                 <div id="resultatKort" class="p-6 rounded-xl border text-center space-y-4 shadow-inner bg-white">
                     <h2 class="text-xs font-bold uppercase tracking-widest text-gray-600">E.T. RÅTESJEKK KONKLUSJON</h2>
+                    
+                    <div class="text-xs font-bold text-gray-700 bg-gray-100 py-1.5 px-3 rounded max-w-sm mx-auto grid grid-cols-2 gap-2 text-left">
+                        <div><b>Netteier:</b> <span id="repNetteier">-</span></div>
+                        <div><b>LinjeID:</b> <span id="repLinje">-</span></div>
+                        <div><b>Mast nr:</b> <span id="repMast">-</span></div>
+                        <div><b>Stolpe nr:</b> <span id="repStolpe">-</span></div>
+                    </div>
+
                     <div class="grid grid-cols-2 gap-2 max-w-sm mx-auto">
                         <div class="bg-gray-50 p-3 rounded-lg border border-black/10">
                             <span class="block text-[10px] uppercase font-bold text-gray-500">Restlevetid</span>
@@ -234,6 +259,9 @@
     </div>
 
     <script>
+        // Global variabel for øktlagring
+        let sisteBeregning = null;
+
         document.addEventListener("DOMContentLoaded", () => {
             document.addEventListener('contextmenu', event => event.preventDefault());
             document.addEventListener('copy', event => event.preventDefault());
@@ -245,9 +273,12 @@
             if (new Date() > new Date("2026-07-13")) {
                 alert("Testperioden er utløpt."); window.location.href = "about:blank"; return;
             }
+            oppdaterHistorikkTeller();
         });
 
-        window.onload = () => document.getElementById('kontrollertAar').value = new Date().getFullYear();
+        window.onload = () => {
+            document.getElementById('kontrollertAar').value = new Date().getFullYear();
+        };
 
         function byttRaatetypeSkjema() {
             const type = document.getElementById('raatetype').value;
@@ -268,7 +299,79 @@
             document.getElementById('alderVisning').innerText = (m && k) ? `Aktiv alder ved kontroll: ${k - m} år` : `Aktiv alder ved kontroll: - år`;
         }
 
-        // --- GRAFISK MOTOR FOR BEGGE RÅTETYPER ---
+        // --- ARBEIDSFLYTKNAPPER ---
+        function nyMast() {
+            // Nullstiller mastespesifikke felt, beholder Netteier og LinjeID
+            document.getElementById('mastepunktNr').value = "";
+            document.getElementById('stolpeNr').value = "";
+            document.getElementById('diameter').value = "";
+            document.getElementById('skadehoyde').value = "";
+            document.getElementById('vaertaert').value = "0";
+            document.getElementById('softraate').value = "";
+            document.getElementById('maaltRestskall').value = "";
+            document.getElementById('ytterskallForan').value = "";
+            document.getElementById('roteBreddeA').value = "";
+            document.getElementById('roteDybdeB').value = "";
+            document.getElementById('resultatSeksjon').classList.add('hidden');
+            sisteBeregning = null;
+            window.scrollTo(0, 0);
+        }
+
+        function nyttAnlegg() {
+            if(confirm("Vil du slette absolutt alle felt og starte et helt nytt anlegg?")) {
+                document.getElementById('netteier').value = "";
+                document.getElementById('linjeId').value = "";
+                document.getElementById('montertAar').value = "";
+                nyMast();
+            }
+        }
+
+        // --- HISTORIKK & EXCEL LOGIKK ---
+        function lagreIHistorikk() {
+            if (!sisteBeregning) {
+                alert("Du må gjøre en beregning først før du kan lagre masten i historikken!");
+                return;
+            }
+            let historikk = JSON.parse(localStorage.getItem('et_raate_historikk')) || [];
+            historikk.push(sisteBeregning);
+            localStorage.setItem('et_raate_historikk', JSON.stringify(historikk));
+            oppdaterHistorikkTeller();
+            alert(`Mast ${sisteBeregning.mastepunkt} er lagret i historikken!`);
+        }
+
+        function oppdaterHistorikkTeller() {
+            let historikk = JSON.parse(localStorage.getItem('et_raate_historikk')) || [];
+            document.getElementById('historikkTeller').innerText = `Lagrede master i gjeldende økt: ${historikk.length}`;
+        }
+
+        function eksporterTilExcel() {
+            let historikk = JSON.parse(localStorage.getItem('et_raate_historikk')) || [];
+            if (historikk.length === 0) {
+                alert("Det finnes ingen lagrede stolper i historikken å eksportere ennå.");
+                return;
+            }
+
+            // CSV-header
+            let csvContent = "\uFEFF"; // BOM for at Excel skal skjønne ÆØÅ automatisk
+            csvContent += "Netteier;LinjeID;Mastepunkt;StolpeNR;Diameter;SkadeHoyde;Raatetype;EffektivtRestskall;Sikkerhetsfaktor;Restlevetid;Konklusjon\n";
+
+            historikk.forEach(row => {
+                csvContent += `${row.netteier};${row.linje};${row.mastepunkt};${row.stolpe};${row.diameter};${row.skadehoyde};${row.type};${row.effRestskall};${row.sf};${row.restlevetid};${row.konklusjon}\n`;
+            });
+
+            // Last ned filen
+            let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            let link = document.createElement("a");
+            let url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `ET_Raatesjekk_Rapport_${new Date().toISOString().slice(0,10)}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // --- GRAFISK MOTOR ---
         function tegnTverrsnitt(type, opprinneligDia, effDia, effRestskall, sf, sone, minSikkerhetsKrav, asymData = null) {
             const canvas = document.getElementById('tverrsnittCanvas');
             const ctx = canvas.getContext('2d');
@@ -283,13 +386,12 @@
             const rEffektiv = (effDia / 2) * scale;
             const rMinKrav = Math.max(0, (effDia / 2) - minSikkerhetsKrav) * scale;
 
-            let farge = '#d97706'; // Gul/Orange
-            if (sf < 1.0 && sone <= 5.0) farge = '#dc2626'; // Rød
-            else if (sf >= 1.0 || sone > 5.0) farge = '#16a34a'; // Grønn
+            let farge = '#d97706'; 
+            if (sf < 1.0 && sone <= 5.0) farge = '#dc2626'; 
+            else if (sf >= 1.0 || sone > 5.0) farge = '#16a34a'; 
             
             document.getElementById('fargeFrisk').style.backgroundColor = farge;
 
-            // 1. Opprinnelig ytre omkrets (Stiplet grå ring)
             ctx.beginPath();
             ctx.arc(cx, cy, rOpprinnelig, 0, 2 * Math.PI);
             ctx.strokeStyle = '#9ca3af';
@@ -298,59 +400,34 @@
             ctx.stroke();
             ctx.setLineDash([]);
 
-            // 2. Tegn friskt, effektivt treverk
             ctx.beginPath();
             ctx.arc(cx, cy, rEffektiv, 0, 2 * Math.PI);
             ctx.fillStyle = farge;
             ctx.fill();
 
             if (type === 'sirkulaer') {
-                // Sentrert sirkelråte
                 const rKjerne = Math.max(0, (effDia / 2) - effRestskall) * scale;
                 ctx.beginPath();
                 ctx.arc(cx, cy, rKjerne, 0, 2 * Math.PI);
                 ctx.fillStyle = '#1f2937';
                 ctx.fill();
-
-                if (rKjerne > 15) {
-                    ctx.fillStyle = 'white';
-                    ctx.font = 'bold 10px sans-serif';
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillText('RÅTE', cx, cy);
-                }
             } else if (type === 'asymmetrisk' && asymData) {
-                // Asymmetrisk måne/sigar-formet råtelomme plassert nederst i tverrsnittet
-                const rA = asymData.A * scale;
-                const rB = asymData.B * scale;
-                const rYtterskall = asymData.ytterskall * scale;
-
                 ctx.save();
-                // Klipp til innsiden av stolpen så ikke lommen "stikker ut"
                 ctx.beginPath();
                 ctx.arc(cx, cy, rEffektiv, 0, 2 * Math.PI);
                 ctx.clip();
 
-                // Etabler en fin råtelomme nederst
                 ctx.beginPath();
-                const lommeHoyde = Math.max(10, rB - rYtterskall);
-                const lommeBredde = Math.max(20, rA);
-                
-                // Posisjoner nederst i tverrsnittet
-                const lommeY = cy + rEffektiv - rYtterskall - (lommeHoyde / 2);
+                const lommeHoyde = Math.max(10, (asymData.B - asymData.ytterskall) * scale);
+                const lommeBredde = Math.max(20, asymData.A * scale);
+                const lommeY = cy + rEffektiv - (asymData.ytterskall * scale) - (lommeHoyde / 2);
                 
                 ctx.ellipse(cx, lommeY, lommeBredde / 2, lommeHoyde / 2, 0, 0, 2 * Math.PI);
-                ctx.fillStyle = '#1f2937'; // Råtefarge
+                ctx.fillStyle = '#1f2937';
                 ctx.fill();
                 ctx.restore();
-
-                ctx.fillStyle = 'white';
-                ctx.font = 'bold 9px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText('LOMME', cx, lommeY + 3);
             }
 
-            // 3. Den Røde Faregrensen (Kun aktiv i Sone A)
             if (sone <= 5.0) {
                 ctx.beginPath();
                 ctx.arc(cx, cy, rMinKrav, 0, 2 * Math.PI);
@@ -384,43 +461,34 @@
                 let effektivtRestskall = 0;
                 let asymDataObj = null;
 
-                // Grunnjustering av tverrsnitt pga ytre slitasje
                 if (vaertaertDybde > 0) effektivDiameter -= vaertaertDybde;
                 if (softraate > 0) effektivDiameter -= (softraate * 2);
 
                 if (type === 'sirkulaer') {
                     const restRaw = document.getElementById('maaltRestskall').value;
                     if (!restRaw) { alert("Tast inn målt restskall."); return; }
-                    
                     effektivtRestskall = parseFloat(restRaw) - vaertaertDybde - softraate;
                 } else {
-                    // ASYMMETRISK BEREGNING (A, B, E, F)
                     const ytterskallRaw = document.getElementById('ytterskallForan').value;
                     const aRaw = document.getElementById('roteBreddeA').value;
                     const bRaw = document.getElementById('roteDybdeB').value;
 
                     if (!ytterskallRaw || !aRaw || !bRaw) {
-                        alert("Vennligst fyll ut Ytterskall, Bredde A og Dybde B."); return;
+                        alert("Fyll ut Ytterskall, Bredde A og Dybde B."); return;
                     }
 
                     const ytterskallForan = parseFloat(ytterskallRaw);
                     const breddeA = parseFloat(aRaw);
                     const dybdeB = parseFloat(bRaw);
 
-                    // Reduser reelle skallverdier med ytre slitasjefaktorer
                     let skallForan = ytterskallForan - vaertaertDybde - softraate;
                     let skallBak = (dia - dybdeB) - vaertaertDybde - softraate;
 
-                    skallForan = Math.max(0, skallForan);
-                    skallBak = Math.max(0, skallBak);
-
-                    // Dynamisk tildeling av bransjebokstavene E og F
                     const minsteE = Math.min(skallForan, skallBak);
                     const storsteF = Math.max(skallForan, skallBak);
 
                     effektivtRestskall = minsteE;
 
-                    // Oppdater bransjevisning på skjermen
                     document.getElementById('valA').innerText = breddeA + " mm";
                     document.getElementById('valB').innerText = dybdeB + " mm";
                     document.getElementById('valE').innerText = minsteE.toFixed(0) + " mm";
@@ -429,52 +497,74 @@
                     asymDataObj = { A: breddeA, B: dybdeB, ytterskall: ytterskallForan };
                 }
 
-                effektivtRestskall = Math.max(0, effektivtRestskall);
+                effektivtRestskall = Math.max(0,Post=effektivtRestskall);
                 effektivDiameter = Math.max(0, effektivDiameter);
 
-                // --- UTREGNING SIKKERHETSFAKTOR (SF) ---
                 let minSikkerhetsKrav = Math.max(35, effektivDiameter * 0.1);
                 let sf = (effektivtRestskall / minSikkerhetsKrav).toFixed(2);
                 let klatreAnbefaling = "";
+                let renTekstKonklusjon = "";
 
                 if (skadehoyde <= 5.0) {
                     if (effektivtRestskall < minSikkerhetsKrav) {
-                        klatreAnbefaling = `<span class="text-red-700 font-black">🔴 KLATREFORBUD (Sone A)</span><br>Sikkerhetsfaktor under 1.0 pga. for tynt effektivt skall (${effektivtRestskall.toFixed(0)} mm). Stolpen krever tiltak eller lift.`;
+                        klatreAnbefaling = `<span class="text-red-700 font-black">🔴 KLATREFORBUD (Sone A)</span><br>Sikkerhetsfaktor under 1.0 pga. for tynt effektivt skall.`;
+                        renTekstKonklusjon = "KLATREFORBUD - Krever tiltak";
                     } else if (effektivtRestskall <= minSikkerhetsKrav + 15) {
-                        klatreAnbefaling = `<span class="text-amber-600 font-black">🟡 VURDERINGSSONE (Sone A)</span><br>Klatring krever skjønn. Sjekk vindretning, mekanisk vinkelstrekk og vedens fasthet før klatring.`;
+                        klatreAnbefaling = `<span class="text-amber-600 font-black">🟡 VURDERINGSSONE (Sone A)</span><br>Klatring krever skjønn og ekstra sikring.`;
+                        renTekstKonklusjon = "Vurderingssone - Bruk skjønn";
                     } else {
-                        klatreAnbefaling = `<span class="text-green-700 font-black">🟢 TRYGG (Sone A)</span><br>Godkjent sikkerhetsmargin for klatring under normale forhold (SF: ${sf}).`;
+                        klatreAnbefaling = `<span class="text-green-700 font-black">🟢 TRYGG (Sone A)</span><br>Godkjent sikkerhetsmargin.`;
+                        renTekstKonklusjon = "Godkjent for klatring";
                     }
                 } else {
-                    klatreAnbefaling = `<span class="text-green-700 font-black">🟢 TRYGG (Sone B)</span><br>Skade lokalisert over knekkpunktet (>5m). Global stabilitet er ivaretatt, men ikke belaste skadestedet direkte.`;
+                    klatreAnbefaling = `<span class="text-green-700 font-black">🟢 TRYGG (Sone B)</span><br>Skade over 5m. Belast ikke skadestedet direkte.`;
+                    renTekstKonklusjon = "Trygg (Sone B)";
                 }
 
-                // Restlevetid
                 let levetid = effektivtRestskall > grense ? Math.round((effektivtRestskall - grense) / 1.5) : 0;
                 
+                // Oppdater tekst i konklusjonsrapporten
+                document.getElementById('repNetteier').innerText = document.getElementById('netteier').value || "-";
+                document.getElementById('repLinje').innerText = document.getElementById('linjeId').value || "-";
+                document.getElementById('repMast').innerText = document.getElementById('mastepunktNr').value || "-";
+                document.getElementById('repStolpe').innerText = document.getElementById('stolpeNr').value || "-";
+
                 document.getElementById('resRestlevetid').innerText = levetid + " år";
                 document.getElementById('resSF').innerText = sf;
                 
-                let vedlikehold = levetid <= 0 ? "Nådd utskiftingsgrense. Må settes opp for snarlig tiltak." : "Godkjent restlevetid. Følg opp ved neste rutinekontroll.";
-
+                let vedlikehold = levetid <= 0 ? "Nådd utskiftingsgrense. Må settes opp for tiltak." : "Godkjent levetid. Følg opp ved neste rutine.";
                 let samletStraff = vaertaertDybde + softraate;
-                let advarsel = samletStraff > 0 ? `<br><span class="text-xs text-red-600 font-bold">* SF er korrigert ned basert på registrert ytre slitasje. Rent effektivt restskall i beregningen: ${effektivtRestskall.toFixed(0)} mm.</span>` : "";
+                let advarsel = samletStraff > 0 ? `<br><span class="text-xs text-red-600 font-bold">* Justert ned for ytre slitasje. Effektivt restskall: ${effektivtRestskall.toFixed(0)} mm.</span>` : "";
 
                 document.getElementById('resKonklusjonBoks').innerHTML = `
                     <p class="text-sm"><b>Klatresikkerhet:</b><br>${klatreAnbefaling}</p>
                     <hr class="my-2 border-gray-300">
-                    <p class="text-sm"><b>Vedlikehold & Levetid:</b><br>${vedlikehold}</p>
+                    <p class="text-sm"><b>Vedlikehold:</b><br>${vedlikehold}</p>
                     ${advarsel}
                 `;
 
-                // Send data til den grafiske motoren
-                tegnTverrsnitt(type, dia, effektivDiameter, effektivtRestskall, sf, skadehoyde, minSikkerhetsKrav, asymDataObj);
+                // Lagre gjeldende data for øktlagring
+                sisteBeregning = {
+                    netteier: document.getElementById('netteier').value || "Ukjent",
+                    linje: document.getElementById('linjeId').value || "Ukjent",
+                    mastepunkt: document.getElementById('mastepunktNr').value || "Ukjent",
+                    stolpe: document.getElementById('stolpeNr').value || "1",
+                    diameter: dia,
+                    skadehoyde: skadehoyde,
+                    type: type === 'sirkulaer' ? "Sirkulær" : "Asymmetrisk",
+                    effRestskall: effektivtRestskall.toFixed(0),
+                    sf: sf,
+                    restlevetid: levetid,
+                    konklusjon: renTekstKonklusjon
+                };
+
+                tegnTverrsnitt(type, dia, effektivDiameter,Post=effektivtRestskall, sf, skadehoyde, minSikkerhetsKrav, asymDataObj);
 
                 document.getElementById('resultatSeksjon').classList.remove('hidden');
                 setTimeout(() => document.getElementById('resultatSeksjon').scrollIntoView({ behavior: 'smooth' }), 100);
 
             } catch (e) {
-                alert("Feil under beregning. Sjekk inndataene.");
+                alert("Feil under beregning.");
             }
         }
     </script>
