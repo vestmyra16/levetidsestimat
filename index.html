@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E.T. – Råtesjekk v13.5</title>
+    <title>E.T. – Råtesjekk v13.6</title>
     <meta name="author" content="E.T. og Sprekkanalyse - Opphavsrett 2026">
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
@@ -88,7 +88,7 @@
                             <select id="klimasone" class="w-full p-2.5 border rounded bg-white text-sm font-medium">
                                 <option value="">-- Velg --</option>
                                 <option value="kyst">Kystsone</option>
-                                <option value="skog">Inlandsone</option>
+                                <option value="skog">Innlandsone</option>
                                 <option value="fjell">Fjellsone</option>
                             </select>
                         </div>
@@ -99,7 +99,8 @@
                                 <option value="fjell">Fjell</option>
                                 <option value="jord_pa_fjell">Jord på fjell</option>
                                 <option value="myr">Myr/Skog</option>
-                                <option value="asfalt">Asfalt</option>
+                                <option value="innmark">Innmark</option>
+                                <option value="asfalt">Asfalt/Betong</option>
                             </select>
                         </div>
                     </div>
@@ -301,7 +302,6 @@
 
         // --- ARBEIDSFLYTKNAPPER ---
         function nyMast() {
-            // Nullstiller mastespesifikke felt, beholder Netteier og LinjeID
             document.getElementById('mastepunktNr').value = "";
             document.getElementById('stolpeNr').value = "";
             document.getElementById('diameter').value = "";
@@ -351,15 +351,13 @@
                 return;
             }
 
-            // CSV-header
-            let csvContent = "\uFEFF"; // BOM for at Excel skal skjønne ÆØÅ automatisk
+            let csvContent = "\uFEFF"; 
             csvContent += "Netteier;LinjeID;Mastepunkt;StolpeNR;Diameter;SkadeHoyde;Raatetype;EffektivtRestskall;Sikkerhetsfaktor;Restlevetid;Konklusjon\n";
 
             historikk.forEach(row => {
                 csvContent += `${row.netteier};${row.linje};${row.mastepunkt};${row.stolpe};${row.diameter};${row.skadehoyde};${row.type};${row.effRestskall};${row.sf};${row.restlevetid};${row.konklusjon}\n`;
             });
 
-            // Last ned filen
             let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             let link = document.createElement("a");
             let url = URL.createObjectURL(blob);
@@ -497,7 +495,7 @@
                     asymDataObj = { A: breddeA, B: dybdeB, ytterskall: ytterskallForan };
                 }
 
-                effektivtRestskall = Math.max(0,Post=effektivtRestskall);
+                effektivtRestskall = Math.max(0, effektivtRestskall);
                 effektivDiameter = Math.max(0, effektivDiameter);
 
                 let minSikkerhetsKrav = Math.max(35, effektivDiameter * 0.1);
@@ -517,56 +515,4 @@
                         renTekstKonklusjon = "Godkjent for klatring";
                     }
                 } else {
-                    klatreAnbefaling = `<span class="text-green-700 font-black">🟢 TRYGG (Sone B)</span><br>Skade over 5m. Belast ikke skadestedet direkte.`;
-                    renTekstKonklusjon = "Trygg (Sone B)";
-                }
-
-                let levetid = effektivtRestskall > grense ? Math.round((effektivtRestskall - grense) / 1.5) : 0;
-                
-                // Oppdater tekst i konklusjonsrapporten
-                document.getElementById('repNetteier').innerText = document.getElementById('netteier').value || "-";
-                document.getElementById('repLinje').innerText = document.getElementById('linjeId').value || "-";
-                document.getElementById('repMast').innerText = document.getElementById('mastepunktNr').value || "-";
-                document.getElementById('repStolpe').innerText = document.getElementById('stolpeNr').value || "-";
-
-                document.getElementById('resRestlevetid').innerText = levetid + " år";
-                document.getElementById('resSF').innerText = sf;
-                
-                let vedlikehold = levetid <= 0 ? "Nådd utskiftingsgrense. Må settes opp for tiltak." : "Godkjent levetid. Følg opp ved neste rutine.";
-                let samletStraff = vaertaertDybde + softraate;
-                let advarsel = samletStraff > 0 ? `<br><span class="text-xs text-red-600 font-bold">* Justert ned for ytre slitasje. Effektivt restskall: ${effektivtRestskall.toFixed(0)} mm.</span>` : "";
-
-                document.getElementById('resKonklusjonBoks').innerHTML = `
-                    <p class="text-sm"><b>Klatresikkerhet:</b><br>${klatreAnbefaling}</p>
-                    <hr class="my-2 border-gray-300">
-                    <p class="text-sm"><b>Vedlikehold:</b><br>${vedlikehold}</p>
-                    ${advarsel}
-                `;
-
-                // Lagre gjeldende data for øktlagring
-                sisteBeregning = {
-                    netteier: document.getElementById('netteier').value || "Ukjent",
-                    linje: document.getElementById('linjeId').value || "Ukjent",
-                    mastepunkt: document.getElementById('mastepunktNr').value || "Ukjent",
-                    stolpe: document.getElementById('stolpeNr').value || "1",
-                    diameter: dia,
-                    skadehoyde: skadehoyde,
-                    type: type === 'sirkulaer' ? "Sirkulær" : "Asymmetrisk",
-                    effRestskall: effektivtRestskall.toFixed(0),
-                    sf: sf,
-                    restlevetid: levetid,
-                    konklusjon: renTekstKonklusjon
-                };
-
-                tegnTverrsnitt(type, dia, effektivDiameter,Post=effektivtRestskall, sf, skadehoyde, minSikkerhetsKrav, asymDataObj);
-
-                document.getElementById('resultatSeksjon').classList.remove('hidden');
-                setTimeout(() => document.getElementById('resultatSeksjon').scrollIntoView({ behavior: 'smooth' }), 100);
-
-            } catch (e) {
-                alert("Feil under beregning.");
-            }
-        }
-    </script>
-</body>
-</html>
+                    klatreAnbefaling = `<span class="text-green-700 font-black">🟢 TRYGG (Sone B)
