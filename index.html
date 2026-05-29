@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E.T. – Råtesjekk v17.2 Auto-Detect (Comprehensive)</title>
+    <title>E.T. – Råtesjekk v17.3 Auto-Detect (Comprehensive)</title>
     <meta name="author" content="E.T. og Sprekkanalyse - Opphavsrett 2026">
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
@@ -32,7 +32,7 @@
         <header class="bg-green-700 text-white p-5 rounded-t-xl shadow-md text-center flex flex-col items-center justify-center">
             <img src="icon.png" alt="E.T. Råtesjekk" class="w-24 h-24 mb-3 rounded-xl shadow-md" onerror="this.style.display='none'">
             <h1 class="text-3xl font-black tracking-tighter text-amber-300">E.T.</h1>
-            <p class="text-xs text-green-100 mt-1 uppercase tracking-wider font-bold">Auto-Detect Full-Scale | v17.2</p>
+            <p class="text-xs text-green-100 mt-1 uppercase tracking-wider font-bold">Auto-Detect Full-Scale | v17.3</p>
         </header>
 
         <main class="bg-white p-6 rounded-b-xl shadow-md border-x border-b border-gray-200 space-y-6 overflow-hidden">
@@ -71,35 +71,41 @@
                 
                 <div class="mb-4 bg-white p-3 rounded-md border border-amber-200 shadow-sm no-print">
                     <p class="text-[11px] text-gray-700 leading-relaxed font-medium">
-                        🤖 <b class="text-amber-900">Auto-Detect Full-Scale aktivert:</b> Velg en skadekategori og tast inn målene fra boret. E.T. vil automatisk bedømme om skaden behandles som 🌙 Bananråte, 🔴 Sirkulær råte, 🌙 Spettsmie eller 🔴 Reirhull (Hul stolpe) og stramme inn HMS-kravene (Grensen) automatisk.
+                        🤖 <b class="text-amber-900">Auto-Detect Full-Scale aktivert:</b> Velg en skadekategori og tast inn målene fra boret. E.T. vil automatisk bedømme om skaden behandles som 🌙 Bananråte, 🔴 Sirkulær råte, 🌙 Spettsmie eller 🔴 Reirhull.
                     </p>
                 </div>
 
                 <div class="bg-white p-3 rounded border border-amber-200 mb-4 space-y-3 shadow-sm no-print">
                     <h3 class="text-[11px] font-bold text-amber-900 uppercase tracking-wide border-b border-amber-100 pb-1">Ytre skader & Dimensjoner</h3>
-                    <div class="grid grid-cols-2 gap-3">
+                    
+                    <div class="grid grid-cols-3 gap-2 mb-3">
                         <div>
-                            <label class="block text-[11px] font-bold text-gray-800 mb-0.5">Ytre skade (steinras/plog/is)</label>
+                            <label class="block text-[10px] font-bold text-gray-800 mb-0.5">Værtært slitasje</label>
                             <select id="vaertaert" class="w-full p-2 border border-amber-300 rounded bg-gray-50 text-xs font-semibold">
                                 <option value="0">Ingen (0 mm)</option>
-                                <option value="5">Lett skade (5 mm)</option>
-                                <option value="10">Moderat skade (10 mm)</option>
-                                <option value="15">Kraftig skade (15 mm)</option>
+                                <option value="5">Lett (5 mm)</option>
+                                <option value="10">Moderat (10 mm)</option>
+                                <option value="15">Kraftig (15 mm)</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[11px] font-bold text-gray-800 mb-0.5">Målt ytre softråte dybde (mm)</label>
-                            <input type="number" id="softraate" placeholder="0" class="w-full p-2 border border-amber-300 rounded bg-gray-50 text-xs text-center font-semibold">
+                            <label class="block text-[10px] font-bold text-gray-800 mb-0.5">Ytre mekanisk skade</label>
+                            <input type="number" id="ytreSkade" placeholder="Eks. 20 mm" class="w-full p-2 border border-amber-300 rounded bg-gray-50 text-xs text-center font-semibold">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-800 mb-0.5">Målt softråte dybde</label>
+                            <input type="number" id="softraate" placeholder="Eks. 5 mm" class="w-full p-2 border border-amber-300 rounded bg-gray-50 text-xs text-center font-semibold">
                         </div>
                     </div>
+
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="block text-[11px] font-bold text-gray-800 mb-0.5">Diameter D på skadested (mm)</label>
-                            <input type="number" id="diameter" placeholder="Eks. 300" class="w-full p-2 border border-amber-400 rounded bg-white text-xs text-center font-bold text-amber-900">
+                            <input type="number" id="diameter" placeholder="Eks. 300" class="w-full p-2.5 border border-amber-400 rounded bg-white text-sm text-center font-black text-amber-900 shadow-sm focus:ring-2 focus:ring-amber-400">
                         </div>
                         <div>
                             <label class="block text-[11px] font-bold text-gray-800 mb-0.5">Skadehøyde over bakken (m)</label>
-                            <input type="number" id="skadehoyde" placeholder="Eks. 1.5" step="0.1" class="w-full p-2 border border-amber-300 rounded bg-white text-xs text-center font-bold text-amber-900">
+                            <input type="number" id="skadehoyde" placeholder="Eks. 1.5" step="0.1" class="w-full p-2.5 border border-amber-300 rounded bg-white text-sm text-center font-bold text-amber-900 shadow-sm focus:ring-2 focus:ring-amber-400">
                         </div>
                     </div>
                 </div>
@@ -134,7 +140,7 @@
                     <div id="div_spettsmie" class="hidden space-y-3 border-t border-amber-200/60 pt-3">
                         <div class="mb-3 bg-blue-50 p-2.5 rounded border border-blue-200 shadow-inner">
                             <p class="text-[11px] text-blue-950 leading-relaxed font-bold">
-                                🌙 <b class="text-blue-950">Spettsmie:</b> Behandles geometrisk som et måneformet hakk med <b class="text-blue-950">null skall i front</b>. E.T. beregner restskallet på baksiden som Crucial HMS-margin. 
+                                🌙 <b class="text-blue-950">Spettsmie:</b> Behandles geometrisk som et måneformet hakk med <b class="text-blue-950">null skall i front</b>.
                             </p>
                         </div>
                         <div class="grid grid-cols-2 gap-2">
@@ -152,7 +158,7 @@
                     <div id="div_reirhull" class="hidden space-y-3 border-t border-amber-200/60 pt-3">
                         <div class="mb-3 bg-purple-50 p-2.5 rounded border border-purple-200 shadow-inner">
                             <p class="text-[11px] text-purple-950 leading-relaxed font-bold">
-                                🔴🦅 <b class="text-purple-950">Reirhull:</b> Behandles som en massiv sirkulær uthulning. E.T. beregner HMS (SF) basert på det <b class="text-purple-950">Målte minimum restskallet (E)</b> du fant rundt reiret. Inngangshull er typisk inntil 100mm.
+                                🔴🦅 <b class="text-purple-950">Reirhull:</b> Behandles som en massiv sirkulær uthulning. E.T. beregner HMS (SF) basert på <b class="text-purple-950">Minimum restskall (E)</b>.
                             </p>
                         </div>
                         <div class="grid grid-cols-2 gap-2">
@@ -199,7 +205,7 @@
                     <h2 class="text-xs font-bold uppercase tracking-widest text-gray-600">E.T. AUTO-DETECT FULL-SCALE KONKLUSJON</h2>
                     
                     <div id="autoDetectBoks" class="max-w-sm mx-auto text-sm font-black py-2 px-3 rounded text-center border">
-                        </div>
+                    </div>
 
                     <div class="text-xs font-bold text-gray-700 bg-gray-100 py-1.5 px-3 rounded max-w-sm mx-auto grid grid-cols-2 gap-2 text-left mt-3 border border-black/5 shadow-inner">
                         <div><b>Netteier:</b> <span id="repNetteier">-</span></div>
@@ -283,6 +289,7 @@
             document.getElementById('diameter').value = "";
             document.getElementById('skadehoyde').value = "";
             document.getElementById('vaertaert').value = "0";
+            document.getElementById('ytreSkade').value = "";
             document.getElementById('softraate').value = "";
             
             document.getElementById('ytt_raw').value = "";
@@ -302,6 +309,7 @@
             if(confirm("Vil du slette absolutt alle felt og starte et helt nytt anlegg?")) {
                 document.getElementById('netteier').value = "";
                 document.getElementById('linjeId').value = "";
+                document.getElementById('montertAar').value = "";
                 nyMast();
             }
         }
@@ -409,7 +417,9 @@
             try {
                 const diaRaw = document.getElementById('diameter').value;
                 const skadehoydeRaw = document.getElementById('skadehoyde').value;
+                
                 const vaertaertDybde = parseFloat(document.getElementById('vaertaert').value) || 0;
+                const ytreSkade = parseFloat(document.getElementById('ytreSkade').value) || 0;
                 const softraate = parseFloat(document.getElementById('softraate').value) || 0;
 
                 if (!diaRaw || !skadehoydeRaw) {
@@ -422,7 +432,12 @@
                 let effektivtRestskall = 0;
                 let specializedDataObj = null;
 
+                // Total ytre straff på én side for beregning av HMS (SF)
+                let ytreTrekk = vaertaertDybde + ytreSkade + softraate;
+
+                // Justering av effektiv diameter
                 if (vaertaertDybde > 0) effektivDiameter -= vaertaertDybde;
+                if (ytreSkade > 0) effektivDiameter -= ytreSkade;
                 if (softraate > 0) effektivDiameter -= (softraate * 2);
 
                 const autoBoks = document.getElementById('autoDetectBoks');
@@ -460,13 +475,13 @@
 
                     specializedDataObj = { A: a, B: b, ytterskall: ytt, type: finalType };
 
-                    let skallForan_eff = Math.max(0, specializedDataObj.ytterskall - vaertaertDybde - softraate);
-                    let skallBak_eff = Math.max(0, (dia - specializedDataObj.B) - vaertaertDybde - softraate);
+                    let skallForan_eff = Math.max(0, specializedDataObj.ytterskall - ytreTrekk);
+                    let skallBak_eff = Math.max(0, (dia - specializedDataObj.B) - ytreTrekk);
                     effektivtRestskall = Math.min(skallForan_eff, skallBak_eff);
 
                     document.getElementById('valA').innerText = a + " mm";
                     document.getElementById('valB').innerText = b + " mm";
-                    document.getElementById('valE').innerText =Box= effektivtRestskall.toFixed(0) + " mm";
+                    document.getElementById('valE').innerText = effektivtRestskall.toFixed(0) + " mm";
                     document.getElementById('valF').innerText = Math.max(skallForan_eff, skallBak_eff).toFixed(0) + " mm";
                     document.getElementById('bransjeDataBoks').classList.remove('hidden');
 
@@ -483,7 +498,7 @@
                     autoBoks.innerHTML = `🌙 SPETTSMIE: Mekanisk hakk hugget utenfra og inn.`;
 
                     specializedDataObj = { A: parseFloat(aRaw), B: parseFloat(bRaw), ytterskall: 0, type: finalType };
-                    let skallBak_eff = Math.max(0, (dia - specializedDataObj.B) - vaertaertDybde - softraate);
+                    let skallBak_eff = Math.max(0, (dia - specializedDataObj.B) - ytreTrekk);
                     effektivtRestskall = skallBak_eff;
 
                     document.getElementById('valA').innerText = specializedDataObj.A + " mm";
@@ -505,7 +520,7 @@
                     autoBoks.innerHTML = `🦅 REIRHULL: Massiv sentrert uthulning (Hul stolpe).`;
 
                     specializedDataObj = { hollowDiameter: parseFloat(hollowDiaRaw), A: parseFloat(eRawReir), B: parseFloat(hollowDiaRaw), D: dia };
-                    let min_shell_eff = Math.max(0, parseFloat(eRawReir) - vaertaertDybde - softraate);
+                    let min_shell_eff = Math.max(0, parseFloat(eRawReir) - ytreTrekk);
                     effektivtRestskall = min_shell_eff;
 
                     let gjennomsnittligF = Math.max(0, (dia - specializedDataObj.hollowDiameter) / 2);
@@ -548,7 +563,7 @@
                     }
                 }
 
-                let levetid =Box= effektivtRestskall > levetid_grense ? Math.round((effektivtRestskall - levetid_grense) / 1.5) : 0;
+                let levetid = effektivtRestskall > levetid_grense ? Math.round((effektivtRestskall - levetid_grense) / 1.5) : 0;
                 if (category === 'reirhull') {
                     if (levetid > 10) levetid = Math.round(levetid * 0.7); 
                     if (effektivtRestskall <= 45) levetid = 0; 
@@ -563,8 +578,7 @@
                 document.getElementById('resSF').innerText = sf;
                 
                 let vedlikehold = levetid <= 0 ? `Nådd utskiftingsgrense (${levetid_grense} mm). Må settes opp for snarlig tiltak.` : "Godkjent restlevetid. Følg opp ved neste rutinekontroll.";
-                let samletStraff = vaertaertDybde + softraate;
-                let advarsel = samletStraff > 0 ? `<br><span class="text-xs text-red-600 font-bold">* SF og restlevetid er justert ned basert på registrert ytre påkjenning/softråte. Reelt restskall i beregningen: ${effektivtRestskall.toFixed(0)} mm.</span>` : "";
+                let advarsel = ytreTrekk > 0 ? `<br><span class="text-xs text-red-600 font-bold">* SF og restlevetid er justert ned basert på registrert ytre slitasje/skade. Reelt restskall i beregningen: ${effektivtRestskall.toFixed(0)} mm.</span>` : "";
 
                 document.getElementById('resKonklusjonBoks').innerHTML = `
                     <p class="text-sm"><b>Klatresikkerhet:</b><br>${klatreAnbefaling}</p>
@@ -581,7 +595,7 @@
                     diameter: dia,
                     skadehoyde: skadehoyde,
                     type: specializedCSV,
-                    effRestskall:Box= effektivtRestskall.toFixed(0),
+                    effRestskall: effektivtRestskall.toFixed(0),
                     sf: sf,
                     restlevetid: levetid,
                     konklusjon: renTekstKonklusjon
