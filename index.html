@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E.T. – Råtesjekk v14.0 Auto-Detect</title>
+    <title>E.T. – Råtesjekk v17.1 Auto-Detect (Comprehensive)</title>
     <meta name="author" content="E.T. og Sprekkanalyse - Opphavsrett 2026">
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
@@ -32,7 +32,7 @@
         <header class="bg-green-700 text-white p-5 rounded-t-xl shadow-md text-center flex flex-col items-center justify-center">
             <img src="icon.png" alt="E.T. Råtesjekk" class="w-24 h-24 mb-3 rounded-xl shadow-md" onerror="this.style.display='none'">
             <h1 class="text-3xl font-black tracking-tighter text-amber-300">E.T.</h1>
-            <p class="text-xs text-green-100 mt-1 uppercase tracking-wider font-bold">Auto-Detect | Sone- & Restlevetidskalkulator</p>
+            <p class="text-xs text-green-100 mt-1 uppercase tracking-wider font-bold">Auto-Detect Full-Scale | v17.1</p>
         </header>
 
         <main class="bg-white p-6 rounded-b-xl shadow-md border-x border-b border-gray-200 space-y-6 overflow-hidden">
@@ -42,70 +42,40 @@
                     <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">1. Grunnlagsdata & Sone</h2>
                     <button type="button" onclick="nyttAnlegg()" class="text-[10px] bg-red-100 text-red-700 font-bold px-2 py-0.5 rounded hover:bg-red-200 transition">💥 NYTT ANLEGG</button>
                 </div>
-                <div class="grid grid-cols-2 gap-3 mb-3">
-                    <div>
-                        <label class="block text-[11px] font-medium text-gray-600 mb-0.5">Netteier / Kontrollør</label>
-                        <input type="text" id="netteier" class="w-full p-2 border rounded bg-white text-sm">
+                <div class="space-y-3">
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                        <div>
+                            <label class="block text-[11px] font-medium text-gray-600 mb-0.5">Netteier / Kontrollør</label>
+                            <input type="text" id="netteier" class="w-full p-2 border rounded bg-white text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-medium text-gray-600 mb-0.5">LinjeID / Anlegg</label>
+                            <input type="text" id="linjeId" class="w-full p-2 border rounded bg-white text-sm">
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-[11px] font-medium text-gray-600 mb-0.5">LinjeID / Anlegg</label>
-                        <input type="text" id="linjeId" class="w-full p-2 border rounded bg-white text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-[11px] font-medium text-gray-600 mb-0.5">Mastepunkt nr.</label>
-                        <input type="text" id="mastepunktNr" class="w-full p-2 border rounded bg-white text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-[11px] font-medium text-gray-600 mb-0.5">Stolpe nr.</label>
-                        <input type="text" id="stolpeNr" class="w-full p-2 border rounded bg-white text-sm">
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-[11px] font-medium text-gray-600 mb-0.5">Klimasone</label>
-                        <select id="klimasone" class="w-full p-2.5 border rounded bg-white text-sm font-medium">
-                            <option value="">-- Velg --</option>
-                            <option value="kyst">Kystsone</option>
-                            <option value="skog">Innlandsone</option>
-                            <option value="fjell">Fjellsone</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-[11px] font-medium text-gray-600 mb-0.5">Jordsmonn</label>
-                        <select id="jordsmonn" class="w-full p-2.5 border rounded bg-white text-sm font-medium">
-                            <option value="">-- Velg --</option>
-                            <option value="fjell">Fjell</option>
-                            <option value="jord_pa_fjell">Jord på fjell</option>
-                            <option value="myr">Myr/Skog</option>
-                            <option value="innmark">Innmark</option>
-                            <option value="asfalt">Asfalt/Betong</option>
-                        </select>
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                        <div>
+                            <label class="block text-[11px] font-medium text-gray-600 mb-0.5">Mastepunkt nr.</label>
+                            <input type="text" id="mastepunktNr" class="w-full p-2 border rounded bg-white text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-medium text-gray-600 mb-0.5">Stolpe nr.</label>
+                            <input type="text" id="stolpeNr" class="w-full p-2 border rounded bg-white text-sm">
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div class="bg-amber-50/50 p-4 rounded-lg border border-amber-200">
-                <h2 class="text-xs font-semibold text-amber-800 uppercase tracking-wider mb-3 border-b border-amber-200 pb-1">2. Fysiske Mål (Råte & Slitasje)</h2>
+                <h2 class="text-xs font-semibold text-amber-800 uppercase tracking-wider mb-3 border-b border-amber-200 pb-1">2. Tilstandskontroll (Råte & Spesialskader)</h2>
                 
                 <div class="mb-4 bg-white p-3 rounded-md border border-amber-200 shadow-sm no-print">
                     <p class="text-[11px] text-gray-700 leading-relaxed font-medium">
-                        🤖 <b class="text-amber-900">Auto-Detect aktivert:</b> Tast inn målene fra boret. E.T. vil automatisk bedømme om skaden behandles som 🌙 Bananråte eller 🔴 Sirkulær råte (Midtpunktsregelen).
+                        🤖 <b class="text-amber-900">Auto-Detect Full-Scale aktivert:</b> Velg en skadekategori og tast inn målene fra boret. E.T. vil automatisk bedømme om skaden behandles som 🌙 Bananråte, 🔴 Sirkulær råte, 🌙 Spettsmie eller 🔴 Reirhull (Hul stolpe) og stramme inn HMS-kravene (Grensen) automatisk.
                     </p>
                 </div>
 
-                <div class="grid grid-cols-2 gap-3 mb-4">
-                    <div>
-                        <label class="block text-[11px] font-bold text-amber-900 mb-0.5">Målt ytre diameter D (mm)</label>
-                        <input type="number" id="diameter" placeholder="Eks. 300" class="w-full p-2.5 border border-amber-400 rounded bg-white text-lg font-black text-center text-amber-900 focus:ring-2 focus:ring-amber-400">
-                    </div>
-                    <div>
-                        <label class="block text-[11px] font-bold text-amber-900 mb-0.5">Skadehøyde over bakken (m)</label>
-                        <input type="number" id="skadehoyde" placeholder="Eks. 1.5" step="0.1" class="w-full p-2.5 border border-amber-400 rounded bg-white text-lg font-black text-center text-amber-900 focus:ring-2 focus:ring-amber-400">
-                    </div>
-                </div>
-
                 <div class="bg-white p-3 rounded border border-amber-200 mb-4 space-y-3 shadow-sm no-print">
-                    <h3 class="text-[11px] font-bold text-amber-900 uppercase tracking-wide border-b border-amber-100 pb-1">Ytre Svekkelse</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
                             <label class="block text-[11px] font-bold text-gray-800 mb-0.5">Værtært / Ytre slitasje</label>
@@ -117,34 +87,85 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[11px] font-bold text-gray-800 mb-0.5">Målt ytre softråte dybde (mm)</label>
-                            <input type="number" id="softraate" placeholder="0" class="w-full p-2 border border-amber-300 rounded bg-gray-50 text-xs text-center font-semibold">
+                            <label class="block text-[11px] font-bold text-gray-800 mb-0.5">Diameter D på skadested (mm)</label>
+                            <input type="number" id="diameter" placeholder="Eks. 300" class="w-full p-2 border border-amber-400 rounded bg-gray-50 text-xs text-center font-bold text-amber-900">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-800 mb-0.5">Skadehøyde over bakken (m)</label>
+                            <input type="number" id="skadehoyde" placeholder="Eks. 1.5" step="0.1" class="w-full p-2 border border-amber-300 rounded bg-gray-50 text-xs text-center font-bold text-amber-900">
                         </div>
                     </div>
                 </div>
 
-                <div class="space-y-3 border-t border-amber-200/60 pt-3">
-                    <h3 class="text-[11px] font-bold text-amber-900 uppercase tracking-wide text-center">Indre Råtemål</h3>
-                    <div class="grid grid-cols-3 gap-2">
-                        <div>
-                            <label class="block text-[10px] font-bold text-amber-900 mb-0.5">Ytterskall (mm)</label>
-                            <input type="number" id="ytterskallForan" placeholder="Eks. 35" class="w-full p-2 border border-amber-400 rounded bg-white text-sm font-bold text-center text-blue-950">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-amber-900 mb-0.5">Råtebredde A (mm)</label>
-                            <input type="number" id="roteBreddeA" placeholder="Eks. 120" class="w-full p-2 border border-amber-400 rounded bg-white text-sm font-bold text-center text-blue-950">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-amber-900 mb-0.5">Dybde B (mm)</label>
-                            <input type="number" id="roteDybdeB" placeholder="Eks. 160" class="w-full p-2 border border-amber-400 rounded bg-white text-sm font-bold text-center text-blue-950">
+                <div class="bg-white p-3 rounded border border-amber-200 mb-4 shadow-sm no-print space-y-3">
+                    <div>
+                        <label class="block text-[11px] font-bold text-amber-900 uppercase tracking-wide mb-1">Velg skadekategori fra målebor</label>
+                        <select id="auto_skadetype" class="w-full p-2.5 border border-amber-400 rounded bg-white text-sm font-black text-amber-950 shadow focus:ring-2 focus:ring-amber-400" onchange="byttSkadeInndata()">
+                            <option value="indreraate">🔴 Indre Råte / Auto-Detect Sirkulaer vs Lunar</option>
+                            <option value="spettsmie">🌙 Spettsmie (Kileformet Mekanisk hakk)</option>
+                            <option value="reirhull">🦅 Hakkespett Reirhull (Sentrert hult rom)</option>
+                        </select>
+                    </div>
+
+                    <div id="div_indreraate" class="space-y-3 border-t border-amber-200/60 pt-3">
+                        <div class="grid grid-cols-3 gap-2">
+                            <div>
+                                <label class="block text-[10px] font-bold text-amber-900 mb-0.5">Ytterskall (mm)</label>
+                                <input type="number" id="ytt_raw" placeholder="Eks. 35" class="w-full p-2 border border-amber-400 rounded bg-white text-sm font-bold text-center text-blue-950 focus:ring-2 focus:ring-blue-400">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-amber-900 mb-0.5">Råtebredde A (mm)</label>
+                                <input type="number" id="a_raw_rot" placeholder="Eks. 120" class="w-full p-2 border border-amber-400 rounded bg-white text-sm font-bold text-center text-blue-950 focus:ring-2 focus:ring-blue-400">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-amber-900 mb-0.5">Dybde B (mm)</label>
+                                <input type="number" id="b_raw_rot" placeholder="Eks. 160" class="w-full p-2 border border-amber-400 rounded bg-white text-sm font-bold text-center text-blue-950 focus:ring-2 focus:ring-blue-400">
+                            </div>
                         </div>
                     </div>
+
+                    <div id="div_spettsmie" class="hidden space-y-3 border-t border-amber-200/60 pt-3">
+                        <div class="mb-3 bg-blue-50 p-2.5 rounded border border-blue-200 shadow-inner">
+                            <p class="text-[11px] text-blue-950 leading-relaxed font-bold">
+                                🌙 <b class="text-blue-950">Spettsmie:</b> Behandles geometrisk som et måneformet hakk med <b class="text-blue-950">null skall i front</b>. E.T. beregner restskallet på baksiden som Crucial HMS-margin. 
+                            </p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-[10px] font-bold text-amber-900 mb-0.5">Kilebredde A på overflate (mm)</label>
+                                <input type="number" id="a_raw_smie" placeholder="Eks. 60" class="w-full p-2 border border-amber-400 rounded bg-white text-sm font-bold text-center text-blue-950 focus:ring-2 focus:ring-blue-400">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-amber-900 mb-0.5">Kiledybde B inn til spiss (mm)</label>
+                                <input type="number" id="b_raw_smie" placeholder="Eks. 80" class="w-full p-2 border border-amber-400 rounded bg-white text-sm font-bold text-center text-blue-950 focus:ring-2 focus:ring-blue-400">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="div_reirhull" class="hidden space-y-3 border-t border-amber-200/60 pt-3">
+                        <div class="mb-3 bg-purple-50 p-2.5 rounded border border-purple-200 shadow-inner">
+                            <p class="text-[11px] text-purple-950 leading-relaxed font-bold">
+                                🔴🦅 <b class="text-purple-950">Reirhull:</b> Behandles som en massiv sirkulær uthulning. E.T. beregner HMS (SF) basert på det <b class="text-purple-950">Målte minimum restskallet (E)</b> du fant rundt reiret. Inngangshull er typisk inntil 100mm.
+                            </p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-[10px] font-bold text-amber-900 mb-0.5">Diameter på hult rom inni (mm)</label>
+                                <input type="number" id="hulDiameterRaw" placeholder="Eks. 150" class="w-full p-2 border border-amber-400 rounded bg-white text-sm font-bold text-center text-blue-950 focus:ring-2 focus:ring-blue-400">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-amber-900 mb-0.5">Målt minimum restskall E (mm)</label>
+                                <input type="number" id="e_raw_reir" placeholder="Eks. 40" class="w-full p-2 border border-amber-400 rounded bg-white text-sm font-bold text-center text-blue-950 focus:ring-2 focus:ring-blue-400">
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
             <div class="space-y-2 pt-2 no-print">
-                <button type="button" onclick="beregnRestlevetid()" class="w-full bg-green-800 hover:bg-green-900 text-white font-bold py-4 px-4 rounded-lg shadow-lg text-center text-lg tracking-wide cursor-pointer transition transform active:scale-95">
-                    🚀 AUTO-BEREGN SIKKERHET
+                <button type="button" onclick="beregnRestlevetid()" class="w-full bg-green-800 hover:bg-green-900 text-white font-bold py-4 px-4 rounded-lg shadow-lg text-center text-xl tracking-wide cursor-pointer transition transform active:scale-95">
+                    🚀 AUTO-DETECT FULL-SCALE SIKKERHET
                 </button>
                 
                 <div class="grid grid-cols-1 gap-2 pt-1">
@@ -160,7 +181,7 @@
                         📊 EKSPORTER (EXCEL)
                     </button>
                     <button type="button" onclick="window.print()" class="bg-blue-900 hover:bg-blue-950 text-white text-xs font-bold py-2.5 rounded shadow cursor-pointer transition">
-                        🖨️ SKRIV UT
+                        🖨️ SKRIV UT / PDF
                     </button>
                 </div>
                 <div id="historikkTeller" class="text-[11px] text-center text-gray-500 font-medium">Lagrede master i gjeldende økt: 0</div>
@@ -168,12 +189,12 @@
 
             <div id="resultatSeksjon" class="hidden transition-all duration-300 mt-4">
                 <div id="resultatKort" class="p-6 rounded-xl border text-center space-y-4 shadow-inner bg-white">
-                    <h2 class="text-xs font-bold uppercase tracking-widest text-gray-600">E.T. AUTO-DETECT KONKLUSJON</h2>
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-gray-600">E.T. AUTO-DETECT FULL-SCALE KONKLUSJON</h2>
                     
                     <div id="autoDetectBoks" class="max-w-sm mx-auto text-sm font-black py-2 px-3 rounded text-center border">
                         </div>
 
-                    <div class="text-xs font-bold text-gray-700 bg-gray-100 py-1.5 px-3 rounded max-w-sm mx-auto grid grid-cols-2 gap-2 text-left">
+                    <div class="text-xs font-bold text-gray-700 bg-gray-100 py-1.5 px-3 rounded max-w-sm mx-auto grid grid-cols-2 gap-2 text-left mt-3 border border-black/5 shadow-inner">
                         <div><b>Netteier:</b> <span id="repNetteier">-</span></div>
                         <div><b>LinjeID:</b> <span id="repLinje">-</span></div>
                         <div><b>Mast nr:</b> <span id="repMast">-</span></div>
@@ -186,14 +207,14 @@
                             <span id="resRestlevetid" class="text-3xl font-black text-gray-900">- år</span>
                         </div>
                         <div class="bg-gray-50 p-3 rounded-lg border border-black/10">
-                            <span class="block text-[10px] uppercase font-bold text-gray-500">Sikkerhetsfaktor</span>
+                            <span class="block text-[10px] uppercase font-bold text-gray-500">Klatre-SF</span>
                             <span id="resSF" class="text-3xl font-black text-blue-900">-</span>
                         </div>
                     </div>
                     
-                    <div id="bransjeDataBoks" class="max-w-sm mx-auto grid grid-cols-4 gap-1.5 bg-blue-50/60 p-2 rounded border border-blue-200 text-center text-xs font-bold text-blue-950">
-                        <div><span class="block text-[9px] text-blue-700 uppercase">Bredde A</span><span id="valA">-</span></div>
-                        <div><span class="block text-[9px] text-blue-700 uppercase">Dybde B</span><span id="valB">-</span></div>
+                    <div id="bransjeDataBoks" class="hidden max-w-sm mx-auto grid grid-cols-4 gap-1.5 bg-blue-50/60 p-2 rounded border border-blue-200 text-center text-xs font-bold text-blue-950">
+                        <div><span class="block text-[9px] text-blue-700 uppercase">A (mm)</span><span id="valA">-</span></div>
+                        <div><span class="block text-[9px] text-blue-700 uppercase">B (mm)</span><span id="valB">-</span></div>
                         <div><span class="block text-[9px] text-red-700 uppercase">Minste E</span><span id="valE">-</span></div>
                         <div><span class="block text-[9px] text-green-700 uppercase">Største F</span><span id="valF">-</span></div>
                     </div>
@@ -203,271 +224,6 @@
                         <canvas id="tverrsnittCanvas" width="240" height="240" class="max-w-full bg-white rounded border border-gray-100 shadow-inner"></canvas>
                         <div class="flex flex-wrap justify-center gap-x-4 gap-y-2 text-[9px] mt-4 font-bold text-gray-600 uppercase">
                             <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full" id="fargeFrisk"></span> Effektiv Vaved</span>
-                            <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-gray-800"></span> Råte/Lomme</span>
-                            <span class="flex items-center gap-1"><span class="w-3 h-0 border-t border-dashed border-gray-500"></span> Midtpunkt (D/2)</span>
-                            <span class="flex items-center gap-1"><span class="w-3 h-0 border-t-2 border-dashed border-red-500"></span> Klatrekrav</span>
-                        </div>
-                    </div>
-
-                    <div class="bg-gray-50 p-3.5 rounded-lg text-sm border border-black/5 text-left space-y-1.5 max-w-md mx-auto" id="resKonklusjonBoks">
-                    </div>
-                </div>
-            </div>
-
-        </main>
-    </div>
-
-    <script>
-        let sisteBeregning = null;
-
-        document.addEventListener("DOMContentLoaded", () => {
-            document.addEventListener('contextmenu', event => event.preventDefault());
-            document.addEventListener('copy', event => event.preventDefault());
-
-            const gyldigDomene = "vestmyra16.github.io";
-            if (window.location.hostname !== "" && window.location.hostname !== gyldigDomene) {
-                document.body.innerHTML = ""; return; 
-            }
-            if (new Date() > new Date("2026-07-13")) {
-                alert("Testperioden er utløpt."); window.location.href = "about:blank"; return;
-            }
-            oppdaterHistorikkTeller();
-        });
-
-        function nyMast() {
-            document.getElementById('mastepunktNr').value = "";
-            document.getElementById('stolpeNr').value = "";
-            document.getElementById('diameter').value = "";
-            document.getElementById('skadehoyde').value = "";
-            document.getElementById('vaertaert').value = "0";
-            document.getElementById('softraate').value = "";
-            document.getElementById('ytterskallForan').value = "";
-            document.getElementById('roteBreddeA').value = "";
-            document.getElementById('roteDybdeB').value = "";
-            document.getElementById('resultatSeksjon').classList.add('hidden');
-            sisteBeregning = null;
-            window.scrollTo(0, 0);
-        }
-
-        function nyttAnlegg() {
-            if(confirm("Slette alle felt og starte nytt anlegg?")) {
-                document.getElementById('netteier').value = "";
-                document.getElementById('linjeId').value = "";
-                nyMast();
-            }
-        }
-
-        function lagreIHistorikk() {
-            if (!sisteBeregning) { alert("Utfør en beregning først!"); return; }
-            let historikk = JSON.parse(localStorage.getItem('et_raate_historikk')) || [];
-            historikk.push(sisteBeregning);
-            localStorage.setItem('et_raate_historikk', JSON.stringify(historikk));
-            oppdaterHistorikkTeller();
-            alert(`Mast ${sisteBeregning.mastepunkt} lagret!`);
-        }
-
-        function oppdaterHistorikkTeller() {
-            let historikk = JSON.parse(localStorage.getItem('et_raate_historikk')) || [];
-            document.getElementById('historikkTeller').innerText = `Lagrede master i gjeldende økt: ${historikk.length}`;
-        }
-
-        function eksporterTilExcel() {
-            let historikk = JSON.parse(localStorage.getItem('et_raate_historikk')) || [];
-            if (historikk.length === 0) { alert("Ingen stolper i historikk."); return; }
-
-            let csvContent = "\uFEFF"; 
-            csvContent += "Netteier;LinjeID;Mastepunkt;StolpeNR;Diameter;SkadeHoyde;Type(AutoDetect);EffektivtRestskall;Sikkerhetsfaktor;Restlevetid;Konklusjon\n";
-
-            historikk.forEach(row => {
-                csvContent += `${row.netteier};${row.linje};${row.mastepunkt};${row.stolpe};${row.diameter};${row.skadehoyde};${row.type};${row.effRestskall};${row.sf};${row.restlevetid};${row.konklusjon}\n`;
-            });
-
-            let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            let link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = `ET_AutoDetect_Rapport_${new Date().toISOString().slice(0,10)}.csv`;
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link); link.click(); document.body.removeChild(link);
-        }
-
-        function tegnTverrsnitt(type, opprinneligDia, effDia, effRestskall, sf, sone, minSikkerhetsKrav, asymData) {
-            const canvas = document.getElementById('tverrsnittCanvas');
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            const cx = canvas.width / 2;
-            const cy = canvas.height / 2;
-            const maxR = 105; 
-            const scale = maxR / (opprinneligDia / 2);
-
-            const rOpprinnelig = (opprinneligDia / 2) * scale;
-            const rEffektiv = (effDia / 2) * scale;
-            const rMinKrav = Math.max(0, (effDia / 2) - minSikkerhetsKrav) * scale;
-
-            let farge = '#d97706'; 
-            if (sf < 1.0 && sone <= 5.0) farge = '#dc2626'; 
-            else if (sf >= 1.0 || sone > 5.0) farge = '#16a34a'; 
-            document.getElementById('fargeFrisk').style.backgroundColor = farge;
-
-            // Opprinnelig ytre kant
-            ctx.beginPath(); ctx.arc(cx, cy, rOpprinnelig, 0, 2 * Math.PI);
-            ctx.strokeStyle = '#9ca3af'; ctx.setLineDash([4, 4]); ctx.lineWidth = 2; ctx.stroke(); ctx.setLineDash([]);
-
-            // Effektivt frisk ved
-            ctx.beginPath(); ctx.arc(cx, cy, rEffektiv, 0, 2 * Math.PI);
-            ctx.fillStyle = farge; ctx.fill();
-
-            // Tegn midtlinje for visualisering av Midtpunktsregelen
-            ctx.beginPath();
-            ctx.moveTo(cx - rEffektiv, cy); ctx.lineTo(cx + rEffektiv, cy);
-            ctx.strokeStyle = 'rgba(0,0,0,0.3)'; ctx.setLineDash([2, 4]); ctx.lineWidth = 1; ctx.stroke(); ctx.setLineDash([]);
-
-            if (type === 'sirkulaer') {
-                const rKjerne = Math.max(0, (effDia / 2) - effRestskall) * scale;
-                ctx.beginPath(); ctx.arc(cx, cy, rKjerne, 0, 2 * Math.PI);
-                ctx.fillStyle = '#1f2937'; ctx.fill();
-            } else if (type === 'asymmetrisk') {
-                ctx.save();
-                ctx.beginPath(); ctx.arc(cx, cy, rEffektiv, 0, 2 * Math.PI); ctx.clip();
-
-                ctx.beginPath();
-                const lommeHoyde = Math.max(10, (asymData.B - asymData.ytterskall) * scale);
-                const lommeBredde = Math.max(20, asymData.A * scale);
-                const lommeY = cy + rEffektiv - (asymData.ytterskall * scale) - (lommeHoyde / 2);
-                
-                ctx.ellipse(cx, lommeY, lommeBredde / 2, lommeHoyde / 2, 0, 0, 2 * Math.PI);
-                ctx.fillStyle = '#1f2937'; ctx.fill();
-                ctx.restore();
-            }
-
-            // Klatrekrav (rød stiplet)
-            if (sone <= 5.0) {
-                ctx.beginPath(); ctx.arc(cx, cy, rMinKrav, 0, 2 * Math.PI);
-                ctx.strokeStyle = '#ef4444'; ctx.setLineDash([3, 3]); ctx.lineWidth = 1.5; ctx.stroke(); ctx.setLineDash([]);
-            }
-        }
-
-        function beregnRestlevetid() {
-            try {
-                const diaRaw = document.getElementById('diameter').value;
-                const skadehoydeRaw = document.getElementById('skadehoyde').value;
-                const yttRaw = document.getElementById('ytterskallForan').value;
-                const aRaw = document.getElementById('roteBreddeA').value;
-                const bRaw = document.getElementById('roteDybdeB').value;
-
-                if (!diaRaw || !skadehoydeRaw || !yttRaw || !aRaw || !bRaw) {
-                    alert("Fyll inn diameter, skadehøyde, samt alle tre indre råtemål (Ytterskall, A og B)."); return;
-                }
-
-                let dia = parseFloat(diaRaw);
-                const skadehoyde = parseFloat(skadehoydeRaw);
-                const ytterskallForan = parseFloat(yttRaw);
-                const breddeA = parseFloat(aRaw);
-                const dybdeB = parseFloat(bRaw);
-
-                const vaertaertDybde = parseFloat(document.getElementById('vaertaert').value) || 0;
-                const softraate = parseFloat(document.getElementById('softraate').value) || 0;
-
-                // --- AUTO-DETECT LOGIKK (MIDTPUNKTSREGELEN) ---
-                let isCircular = (dybdeB > (dia / 2));
-                let type = isCircular ? 'sirkulaer' : 'asymmetrisk';
-                let grense = isCircular ? 35 : 45;
-
-                let effektivDiameter = dia;
-                if (vaertaertDybde > 0) effektivDiameter -= vaertaertDybde;
-                if (softraate > 0) effektivDiameter -= (softraate * 2);
-
-                let skallForan = ytterskallForan - vaertaertDybde - softraate;
-                let skallBak = (dia - dybdeB) - vaertaertDybde - softraate;
-
-                const minsteE = Math.max(0, Math.min(skallForan, skallBak));
-                const storsteF = Math.max(0, Math.max(skallForan, skallBak));
-                const effektivtRestskall = minsteE;
-                
-                effektivDiameter = Math.max(0, effektivDiameter);
-
-                // UI Oppdateringer Auto-Detect boks
-                const autoBoks = document.getElementById('autoDetectBoks');
-                if (isCircular) {
-                    autoBoks.className = "max-w-sm mx-auto text-sm font-black py-2 px-3 rounded text-center border bg-red-100 text-red-900 border-red-300";
-                    autoBoks.innerHTML = `🔴 Råte har passert midtpunkt (${(dia/2).toFixed(0)} mm).<br>Bedømmes som Sirkulær Råte (Grense: 35 mm).`;
-                } else {
-                    autoBoks.className = "max-w-sm mx-auto text-sm font-black py-2 px-3 rounded text-center border bg-yellow-100 text-yellow-900 border-yellow-400";
-                    autoBoks.innerHTML = `🌙 Råte på egenside av midtpunkt (${(dia/2).toFixed(0)} mm).<br>Bedømmes som Bananråte (Grense: 45 mm).`;
-                }
-
-                document.getElementById('valA').innerText = breddeA + " mm";
-                document.getElementById('valB').innerText = dybdeB + " mm";
-                document.getElementById('valE').innerText = minsteE.toFixed(0) + " mm";
-                document.getElementById('valF').innerText = storsteF.toFixed(0) + " mm";
-
-                let asymDataObj = { A: breddeA, B: dybdeB, ytterskall: ytterskallForan };
-
-                let minSikkerhetsKrav = Math.max(35, effektivDiameter * 0.1);
-                let sf = (effektivtRestskall / minSikkerhetsKrav).toFixed(2);
-                let klatreAnbefaling = "";
-                let renTekstKonklusjon = "";
-
-                if (skadehoyde <= 5.0) {
-                    if (effektivtRestskall < minSikkerhetsKrav) {
-                        klatreAnbefaling = `<span class="text-red-700 font-black">🔴 KLATREFORBUD (Sone A)</span><br>Sikkerhetsfaktor under 1.0 pga. for tynt effektivt skall.`;
-                        renTekstKonklusjon = "KLATREFORBUD - Krever tiltak";
-                    } else if (effektivtRestskall <= minSikkerhetsKrav + 15) {
-                        klatreAnbefaling = `<span class="text-amber-600 font-black">🟡 VURDERINGSSONE (Sone A)</span><br>Klatring krever skjønn og ekstra sikring.`;
-                        renTekstKonklusjon = "Vurderingssone - Bruk skjønn";
-                    } else {
-                        klatreAnbefaling = `<span class="text-green-700 font-black">🟢 TRYGG (Sone A)</span><br>Godkjent sikkerhetsmargin.`;
-                        renTekstKonklusjon = "Godkjent for klatring";
-                    }
-                } else {
-                    klatreAnbefaling = `<span class="text-green-700 font-black">🟢 TRYGG (Sone B)</span><br>Skade over 5m. Belast ikke skadestedet direkte.`;
-                    renTekstKonklusjon = "Trygg (Sone B)";
-                }
-
-                let levetid = effektivtRestskall > grense ? Math.round((effektivtRestskall - grense) / 1.5) : 0;
-                
-                document.getElementById('repNetteier').innerText = document.getElementById('netteier').value || "-";
-                document.getElementById('repLinje').innerText = document.getElementById('linjeId').value || "-";
-                document.getElementById('repMast').innerText = document.getElementById('mastepunktNr').value || "-";
-                document.getElementById('repStolpe').innerText = document.getElementById('stolpeNr').value || "-";
-
-                document.getElementById('resRestlevetid').innerText = levetid + " år";
-                document.getElementById('resSF').innerText = sf;
-                
-                let vedlikehold = levetid <= 0 ? `Nådd utskiftingsgrense (${grense} mm). Må settes opp for tiltak.` : "Godkjent levetid. Følg opp ved neste rutine.";
-                let samletStraff = vaertaertDybde + softraate;
-                let advarsel = samletStraff > 0 ? `<br><span class="text-xs text-red-600 font-bold">* Justert ned for ytre slitasje. Effektivt restskall: ${effektivtRestskall.toFixed(0)} mm.</span>` : "";
-
-                document.getElementById('resKonklusjonBoks').innerHTML = `
-                    <p class="text-sm"><b>Klatresikkerhet:</b><br>${klatreAnbefaling}</p>
-                    <hr class="my-2 border-gray-300">
-                    <p class="text-sm"><b>Vedlikehold:</b><br>${vedlikehold}</p>
-                    ${advarsel}
-                `;
-
-                sisteBeregning = {
-                    netteier: document.getElementById('netteier').value || "Ukjent",
-                    linje: document.getElementById('linjeId').value || "Ukjent",
-                    mastepunkt: document.getElementById('mastepunktNr').value || "Ukjent",
-                    stolpe: document.getElementById('stolpeNr').value || "1",
-                    diameter: dia,
-                    skadehoyde: skadehoyde,
-                    type: isCircular ? "Sirkulær (Auto)" : "Bananråte (Auto)",
-                    effRestskall: effektivtRestskall.toFixed(0),
-                    sf: sf,
-                    restlevetid: levetid,
-                    konklusjon: renTekstKonklusjon
-                };
-
-                tegnTverrsnitt(type, dia, effektivDiameter, effektivtRestskall, sf, skadehoyde, minSikkerhetsKrav, asymDataObj);
-
-                document.getElementById('resultatSeksjon').classList.remove('hidden');
-                setTimeout(() => document.getElementById('resultatSeksjon').scrollIntoView({ behavior: 'smooth' }), 100);
-
-            } catch (e) {
-                alert("Feil under beregning.");
-            }
-        }
-    </script>
-</body>
-</html>
+                            <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-gray-800"></span> Skade (Råte/Smie/Reir)</span>
+                            <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full border border-dashed border-gray-400"></span> Opprinnelig Dia</span>
+                            <span class="flex items
