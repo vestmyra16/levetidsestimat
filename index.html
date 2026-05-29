@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E.T. – Råtesjekk v17.1 Auto-Detect (Comprehensive)</title>
+    <title>E.T. – Råtesjekk v17.2 Auto-Detect (Comprehensive)</title>
     <meta name="author" content="E.T. og Sprekkanalyse - Opphavsrett 2026">
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
@@ -32,7 +32,7 @@
         <header class="bg-green-700 text-white p-5 rounded-t-xl shadow-md text-center flex flex-col items-center justify-center">
             <img src="icon.png" alt="E.T. Råtesjekk" class="w-24 h-24 mb-3 rounded-xl shadow-md" onerror="this.style.display='none'">
             <h1 class="text-3xl font-black tracking-tighter text-amber-300">E.T.</h1>
-            <p class="text-xs text-green-100 mt-1 uppercase tracking-wider font-bold">Auto-Detect Full-Scale | v17.1</p>
+            <p class="text-xs text-green-100 mt-1 uppercase tracking-wider font-bold">Auto-Detect Full-Scale | v17.2</p>
         </header>
 
         <main class="bg-white p-6 rounded-b-xl shadow-md border-x border-b border-gray-200 space-y-6 overflow-hidden">
@@ -76,23 +76,30 @@
                 </div>
 
                 <div class="bg-white p-3 rounded border border-amber-200 mb-4 space-y-3 shadow-sm no-print">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <h3 class="text-[11px] font-bold text-amber-900 uppercase tracking-wide border-b border-amber-100 pb-1">Ytre skader & Dimensjoner</h3>
+                    <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-[11px] font-bold text-gray-800 mb-0.5">Værtært / Ytre slitasje</label>
+                            <label class="block text-[11px] font-bold text-gray-800 mb-0.5">Ytre skade (steinras/plog/is)</label>
                             <select id="vaertaert" class="w-full p-2 border border-amber-300 rounded bg-gray-50 text-xs font-semibold">
                                 <option value="0">Ingen (0 mm)</option>
-                                <option value="5">Lett slitasje (5 mm)</option>
-                                <option value="10">Moderat slitasje (10 mm)</option>
-                                <option value="15">Kraftig slitasje (15 mm)</option>
+                                <option value="5">Lett skade (5 mm)</option>
+                                <option value="10">Moderat skade (10 mm)</option>
+                                <option value="15">Kraftig skade (15 mm)</option>
                             </select>
                         </div>
                         <div>
+                            <label class="block text-[11px] font-bold text-gray-800 mb-0.5">Målt ytre softråte dybde (mm)</label>
+                            <input type="number" id="softraate" placeholder="0" class="w-full p-2 border border-amber-300 rounded bg-gray-50 text-xs text-center font-semibold">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
                             <label class="block text-[11px] font-bold text-gray-800 mb-0.5">Diameter D på skadested (mm)</label>
-                            <input type="number" id="diameter" placeholder="Eks. 300" class="w-full p-2 border border-amber-400 rounded bg-gray-50 text-xs text-center font-bold text-amber-900">
+                            <input type="number" id="diameter" placeholder="Eks. 300" class="w-full p-2 border border-amber-400 rounded bg-white text-xs text-center font-bold text-amber-900">
                         </div>
                         <div>
                             <label class="block text-[11px] font-bold text-gray-800 mb-0.5">Skadehøyde over bakken (m)</label>
-                            <input type="number" id="skadehoyde" placeholder="Eks. 1.5" step="0.1" class="w-full p-2 border border-amber-300 rounded bg-gray-50 text-xs text-center font-bold text-amber-900">
+                            <input type="number" id="skadehoyde" placeholder="Eks. 1.5" step="0.1" class="w-full p-2 border border-amber-300 rounded bg-white text-xs text-center font-bold text-amber-900">
                         </div>
                     </div>
                 </div>
@@ -226,4 +233,368 @@
                             <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full" id="fargeFrisk"></span> Effektiv Vaved</span>
                             <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-gray-800"></span> Skade (Råte/Smie/Reir)</span>
                             <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full border border-dashed border-gray-400"></span> Opprinnelig Dia</span>
-                            <span class="flex items
+                            <span class="flex items-center gap-1"><span class="w-3 h-0 border-t-2 border-dashed border-red-500"></span> Minstekrav Klatring</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 p-3.5 rounded-lg text-sm border border-black/5 text-left space-y-1.5 max-w-md mx-auto" id="resKonklusjonBoks">
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        let sisteBeregning = null;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            document.addEventListener('contextmenu', event => event.preventDefault());
+            document.addEventListener('copy', event => event.preventDefault());
+
+            const gyldigDomene = "vestmyra16.github.io";
+            if (window.location.hostname !== "" && window.location.hostname !== gyldigDomene) {
+                document.body.innerHTML = ""; return; 
+            }
+            if (new Date() > new Date("2026-07-13")) {
+                alert("Testperioden er utløpt."); window.location.href = "about:blank"; return;
+            }
+            oppdaterHistorikkTeller();
+        });
+
+        window.onload = () => {
+            document.getElementById('kontrollertAar').value = new Date().getFullYear();
+        };
+
+        function byttSkadeInndata() {
+            const type = document.getElementById('auto_skadetype').value;
+            document.getElementById('div_indreraate').classList.add('hidden');
+            document.getElementById('div_spettsmie').classList.add('hidden');
+            document.getElementById('div_reirhull').classList.add('hidden');
+
+            if (type === 'indreraate') document.getElementById('div_indreraate').classList.remove('hidden');
+            else if (type === 'spettsmie') document.getElementById('div_spettsmie').classList.remove('hidden');
+            else if (type === 'reirhull') document.getElementById('div_reirhull').classList.remove('hidden');
+        }
+
+        function nyMast() {
+            document.getElementById('mastepunktNr').value = "";
+            document.getElementById('stolpeNr').value = "";
+            document.getElementById('diameter').value = "";
+            document.getElementById('skadehoyde').value = "";
+            document.getElementById('vaertaert').value = "0";
+            document.getElementById('softraate').value = "";
+            
+            document.getElementById('ytt_raw').value = "";
+            document.getElementById('a_raw_rot').value = "";
+            document.getElementById('b_raw_rot').value = "";
+            document.getElementById('a_raw_smie').value = "";
+            document.getElementById('b_raw_smie').value = "";
+            document.getElementById('hulDiameterRaw').value = "";
+            document.getElementById('e_raw_reir').value = "";
+
+            document.getElementById('resultatSeksjon').classList.add('hidden');
+            sisteBeregning = null;
+            window.scrollTo(0, 0);
+        }
+
+        function nyttAnlegg() {
+            if(confirm("Vil du slette absolutt alle felt og starte et helt nytt anlegg?")) {
+                document.getElementById('netteier').value = "";
+                document.getElementById('linjeId').value = "";
+                nyMast();
+            }
+        }
+
+        function lagreIHistorikk() {
+            if (!sisteBeregning) { alert("Utfør en beregning først!"); return; }
+            let historikk = JSON.parse(localStorage.getItem('et_raate_historikk')) || [];
+            historikk.push(sisteBeregning);
+            localStorage.setItem('et_raate_historikk', JSON.stringify(historikk));
+            oppdaterHistorikkTeller();
+            alert(`Mast ${sisteBeregning.mastepunkt} lagret!`);
+        }
+
+        function oppdaterHistorikkTeller() {
+            let historikk = JSON.parse(localStorage.getItem('et_raate_historikk')) || [];
+            document.getElementById('historikkTeller').innerText = `Lagrede master i gjeldende økt: ${historikk.length}`;
+        }
+
+        function eksporterTilExcel() {
+            let historikk = JSON.parse(localStorage.getItem('et_raate_historikk')) || [];
+            if (historikk.length === 0) { alert("Ingen stolper i historikk."); return; }
+
+            let csvContent = "\uFEFF"; 
+            csvContent += "Netteier;LinjeID;Mastepunkt;StolpeNR;Diameter;SkadeHoyde;Skadekategori(AutoDetect);EffektivtRestskall;Klatre-SF;Restlevetid;Konklusjon\n";
+
+            historikk.forEach(row => {
+                csvContent += `${row.netteier};${row.linje};${row.mastepunkt};${row.stolpe};${row.diameter};${row.skadehoyde};${row.type};${row.effRestskall};${row.sf};${row.restlevetid};${row.konklusjon}\n`;
+            });
+
+            let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            let link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `ET_AutoDetect_FullScale_Rapport_${new Date().toISOString().slice(0,10)}.csv`;
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        }
+
+        function tegnTverrsnitt(type, opprinneligDia, effDia, effRestskall, sf, sone, minSikkerhetsKrav, specializedData) {
+            const canvas = document.getElementById('tverrsnittCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+            const maxR = 105; 
+            const scale = maxR / (opprinneligDia / 2);
+
+            const rOpprinnelig = (opprinneligDia / 2) * scale;
+            const rEffektiv = (effDia / 2) * scale;
+            const rMinKrav = Math.max(0, (effDia / 2) - minSikkerhetsKrav) * scale;
+
+            let farge = '#d97706'; 
+            if (sf < 1.0 && sone <= 5.0) farge = '#dc2626'; 
+            else if (sf >= 1.0 || sone > 5.0) farge = '#16a34a'; 
+            document.getElementById('fargeFrisk').style.backgroundColor = farge;
+
+            ctx.beginPath(); ctx.arc(cx, cy, rOpprinnelig, 0, 2 * Math.PI);
+            ctx.strokeStyle = '#9ca3af'; ctx.setLineDash([4, 4]); ctx.lineWidth = 2; ctx.stroke(); ctx.setLineDash([]);
+
+            ctx.beginPath(); ctx.arc(cx, cy, rEffektiv, 0, 2 * Math.PI);
+            ctx.fillStyle = farge; ctx.fill();
+
+            if (type.includes("Auto") || type.includes("Banan") || type.includes("Sirkulaer")) {
+                ctx.beginPath();
+                ctx.moveTo(cx - rEffektiv, cy); ctx.lineTo(cx + rEffektiv, cy);
+                ctx.strokeStyle = 'rgba(0,0,0,0.3)'; ctx.setLineDash([2, 4]); ctx.lineWidth = 1; ctx.stroke(); ctx.setLineDash([]);
+            }
+
+            if (type === 'sirkulaer') {
+                const rKjerne = Math.max(0, (effDia / 2) - effRestskall) * scale;
+                ctx.beginPath(); ctx.arc(cx, cy, rKjerne, 0, 2 * Math.PI);
+                ctx.fillStyle = '#1f2937'; ctx.fill();
+            } else if (type === 'asymmetrisk') {
+                ctx.save();
+                ctx.beginPath(); ctx.arc(cx, cy, rEffektiv, 0, 2 * Math.PI); ctx.clip();
+
+                ctx.beginPath();
+                const lommeHoyde = Math.max(10, (specializedData.B - specializedData.ytterskall) * scale);
+                const lommeBredde = Math.max(20, specializedData.A * scale);
+                const lommeY = cy + rEffektiv - (specializedData.ytterskall * scale) - (lommeHoyde / 2);
+                
+                ctx.ellipse(cx, lommeY, lommeBredde / 2, lommeHoyde / 2, 0, 0, 2 * Math.PI);
+                ctx.fillStyle = '#1f2937'; ctx.fill();
+                ctx.restore();
+            } else if (type === 'reirhull') {
+                const rKjerne = (specializedData.hollowDiameter / 2) * scale;
+                ctx.beginPath(); ctx.arc(cx, cy, rKjerne, 0, 2 * Math.PI);
+                ctx.fillStyle = '#f9fafb'; ctx.fill();
+                
+                ctx.save();
+                ctx.beginPath(); ctx.moveTo(cx, cy);
+                const aRad = specializedData.A / specializedData.D; 
+                ctx.arc(cx, cy, rOpprinnelig, 1.5 * Math.PI - (aRad * Math.PI), 1.5 * Math.PI + (aRad * Math.PI)); 
+                ctx.fillStyle = '#f9fafb'; ctx.fill();
+                ctx.restore();
+            }
+
+            if (sone <= 5.0) {
+                ctx.beginPath(); ctx.arc(cx, cy, rMinKrav, 0, 2 * Math.PI);
+                ctx.strokeStyle = '#ef4444'; ctx.setLineDash([3, 3]); ctx.lineWidth = 1.5; ctx.stroke(); ctx.setLineDash([]);
+            }
+        }
+
+        function beregnRestlevetid() {
+            try {
+                const diaRaw = document.getElementById('diameter').value;
+                const skadehoydeRaw = document.getElementById('skadehoyde').value;
+                const vaertaertDybde = parseFloat(document.getElementById('vaertaert').value) || 0;
+                const softraate = parseFloat(document.getElementById('softraate').value) || 0;
+
+                if (!diaRaw || !skadehoydeRaw) {
+                    alert("Fyll inn diameter og skadehøyde."); return;
+                }
+
+                let dia = parseFloat(diaRaw);
+                const skadehoyde = parseFloat(skadehoydeRaw);
+                let effektivDiameter = dia;
+                let effektivtRestskall = 0;
+                let specializedDataObj = null;
+
+                if (vaertaertDybde > 0) effektivDiameter -= vaertaertDybde;
+                if (softraate > 0) effektivDiameter -= (softraate * 2);
+
+                const autoBoks = document.getElementById('autoDetectBoks');
+                autoBoks.className = "max-w-sm mx-auto text-sm font-black py-2 px-3 rounded text-center border bg-gray-50 text-gray-900 border-gray-200";
+
+                const category = document.getElementById('auto_skadetype').value;
+                let finalType = "";
+                let specializedCSV = "";
+                let levetid_grense = 35; 
+                
+                if (category === 'indreraate') {
+                    const yttRaw = document.getElementById('ytt_raw').value;
+                    const aRaw = document.getElementById('a_raw_rot').value;
+                    const bRaw = document.getElementById('b_raw_rot').value;
+
+                    if (!yttRaw || !aRaw || !bRaw) { alert("Fyll ut Ytterskall, A og B."); return; }
+                    
+                    let ytt = parseFloat(yttRaw);
+                    let a = parseFloat(aRaw);
+                    let b = parseFloat(bRaw);
+                    specializedCSV = "Indre Råte";
+
+                    let isCircular = (b > (dia / 2));
+                    if (isCircular) {
+                        finalType = 'sirkulaer';
+                        levetid_grense = 35;
+                        autoBoks.className = "max-w-sm mx-auto text-sm font-black py-2 px-3 rounded text-center border bg-red-100 text-red-900 border-red-300";
+                        autoBoks.innerHTML = `🔴 KRITISK OVERGANG: Råte har passert midtpunkt (${(dia/2).toFixed(0)} mm).<br>Bedømmes konservativt som Sirkulær Råte.`;
+                    } else {
+                        finalType = 'asymmetrisk';
+                        levetid_grense = 45;
+                        autoBoks.className = "max-w-sm mx-auto text-sm font-black py-2 px-3 rounded text-center border bg-yellow-100 text-yellow-900 border-yellow-400";
+                        autoBoks.innerHTML = `🌙 BANANRÅTE / RÅTELOMME: Råte holder seg på egenside av midtpunkt (${(dia/2).toFixed(0)} mm).`;
+                    }
+
+                    specializedDataObj = { A: a, B: b, ytterskall: ytt, type: finalType };
+
+                    let skallForan_eff = Math.max(0, specializedDataObj.ytterskall - vaertaertDybde - softraate);
+                    let skallBak_eff = Math.max(0, (dia - specializedDataObj.B) - vaertaertDybde - softraate);
+                    effektivtRestskall = Math.min(skallForan_eff, skallBak_eff);
+
+                    document.getElementById('valA').innerText = a + " mm";
+                    document.getElementById('valB').innerText = b + " mm";
+                    document.getElementById('valE').innerText =Box= effektivtRestskall.toFixed(0) + " mm";
+                    document.getElementById('valF').innerText = Math.max(skallForan_eff, skallBak_eff).toFixed(0) + " mm";
+                    document.getElementById('bransjeDataBoks').classList.remove('hidden');
+
+                } else if (category === 'spettsmie') {
+                    const aRaw = document.getElementById('a_raw_smie').value;
+                    const bRaw = document.getElementById('b_raw_smie').value;
+                    if (!aRaw || !bRaw) { alert("Fyll ut Kilebredde A og Dybde B."); return; }
+                    
+                    specializedCSV = "Spettsmie";
+                    finalType = 'asymmetrisk'; 
+                    levetid_grense = 45; 
+
+                    autoBoks.className = "max-w-sm mx-auto text-sm font-black py-2 px-3 rounded text-center border bg-blue-100 text-blue-950 border-blue-300";
+                    autoBoks.innerHTML = `🌙 SPETTSMIE: Mekanisk hakk hugget utenfra og inn.`;
+
+                    specializedDataObj = { A: parseFloat(aRaw), B: parseFloat(bRaw), ytterskall: 0, type: finalType };
+                    let skallBak_eff = Math.max(0, (dia - specializedDataObj.B) - vaertaertDybde - softraate);
+                    effektivtRestskall = skallBak_eff;
+
+                    document.getElementById('valA').innerText = specializedDataObj.A + " mm";
+                    document.getElementById('valB').innerText = specializedDataObj.B + " mm";
+                    document.getElementById('valE').innerText = effektivtRestskall.toFixed(0) + " mm";
+                    document.getElementById('valF').innerText = "0 mm";
+                    document.getElementById('bransjeDataBoks').classList.remove('hidden');
+
+                } else if (category === 'reirhull') {
+                    const hollowDiaRaw = document.getElementById('hulDiameterRaw').value;
+                    const eRawReir = document.getElementById('e_raw_reir').value;
+                    if (!hollowDiaRaw || !eRawReir) { alert("Fyll ut Diameter på hult rom og Minste E-skall."); return; }
+
+                    specializedCSV = "Reirhull (Hul)";
+                    finalType = 'reirhull'; 
+                    levetid_grense = 45; 
+
+                    autoBoks.className = "max-w-sm mx-auto text-sm font-black py-2 px-3 rounded text-center border bg-purple-100 text-purple-950 border-purple-400";
+                    autoBoks.innerHTML = `🦅 REIRHULL: Massiv sentrert uthulning (Hul stolpe).`;
+
+                    specializedDataObj = { hollowDiameter: parseFloat(hollowDiaRaw), A: parseFloat(eRawReir), B: parseFloat(hollowDiaRaw), D: dia };
+                    let min_shell_eff = Math.max(0, parseFloat(eRawReir) - vaertaertDybde - softraate);
+                    effektivtRestskall = min_shell_eff;
+
+                    let gjennomsnittligF = Math.max(0, (dia - specializedDataObj.hollowDiameter) / 2);
+                    document.getElementById('valA').innerText = specializedDataObj.A + " mm";
+                    document.getElementById('valB').innerText = specializedDataObj.B + " mm";
+                    document.getElementById('valE').innerText = effektivtRestskall.toFixed(0) + " mm";
+                    document.getElementById('valF').innerText = gjennomsnittligF.toFixed(0) + " mm";
+                    document.getElementById('bransjeDataBoks').classList.remove('hidden');
+
+                    if (specializedDataObj.hollowDiameter > (dia * 0.7)) {
+                         levetid_grense += 20; 
+                    }
+                }
+
+                effektivtRestskall = Math.max(0, effektivtRestskall);
+                effektivDiameter = Math.max(0, effektivDiameter);
+
+                let minSikkerhetsKrav = Math.max(35, effektivDiameter * 0.1);
+                let sf = (effektivtRestskall / minSikkerhetsKrav).toFixed(2);
+                let klatreAnbefaling = "";
+                let renTekstKonklusjon = "";
+
+                if (skadehoyde <= 5.0) {
+                    if (effektivtRestskall < minSikkerhetsKrav) {
+                        klatreAnbefaling = `<span class="text-red-700 font-black">🔴 KLATREFORBUD (Sone A)</span><br>Sikkerhetsfaktor under 1.0 pga. for tynt bærende skall (${effektivtRestskall.toFixed(0)} mm). Stolpen krever tiltak eller lift.`;
+                        renTekstKonklusjon = "KLATREFORBUD";
+                    } else if (effektivtRestskall <= minSikkerhetsKrav + 15) {
+                        klatreAnbefaling = `<span class="text-amber-600 font-black">🟡 VURDERINGSSONE (Sone A)</span><br>Klatring krever skjønn. Sjekk vind, vinkelstrekk og vedens fasthet. SF: ${sf}.`;
+                        renTekstKonklusjon = "Vurderingssone";
+                    } else {
+                        klatreAnbefaling = `<span class="text-green-700 font-black">🟢 TRYGG (Sone A)</span><br>Godkjent klatremargin under normale forhold (SF: ${sf}).`;
+                        renTekstKonklusjon = "Godkjent for klatring";
+                    }
+                } else {
+                    klatreAnbefaling = `<span class="text-green-700 font-black">🟢 TRYGG (Sone B)</span><br>Skade over knekkpunkt (>5m). Global stabilitet er ok. SF: ${sf}. Unngå belastning på skadestedet.`;
+                    renTekstKonklusjon = "Trygg (Sone B)";
+                    
+                    if (category === 'reirhull') {
+                         klatreAnbefaling += `<br><br><span class="text-purple-800 font-bold">🦅 OBS REIRHULL: Ekstrem lokal fare ved klatring FORBI hullet hvis SF < 1.0.</span>`;
+                    }
+                }
+
+                let levetid =Box= effektivtRestskall > levetid_grense ? Math.round((effektivtRestskall - levetid_grense) / 1.5) : 0;
+                if (category === 'reirhull') {
+                    if (levetid > 10) levetid = Math.round(levetid * 0.7); 
+                    if (effektivtRestskall <= 45) levetid = 0; 
+                }
+
+                document.getElementById('repNetteier').innerText = document.getElementById('netteier').value || "-";
+                document.getElementById('repLinje').innerText = document.getElementById('linjeId').value || "-";
+                document.getElementById('repMast').innerText = document.getElementById('mastepunktNr').value || "-";
+                document.getElementById('repStolpe').innerText = document.getElementById('stolpeNr').value || "-";
+
+                document.getElementById('resRestlevetid').innerText = levetid + " år";
+                document.getElementById('resSF').innerText = sf;
+                
+                let vedlikehold = levetid <= 0 ? `Nådd utskiftingsgrense (${levetid_grense} mm). Må settes opp for snarlig tiltak.` : "Godkjent restlevetid. Følg opp ved neste rutinekontroll.";
+                let samletStraff = vaertaertDybde + softraate;
+                let advarsel = samletStraff > 0 ? `<br><span class="text-xs text-red-600 font-bold">* SF og restlevetid er justert ned basert på registrert ytre påkjenning/softråte. Reelt restskall i beregningen: ${effektivtRestskall.toFixed(0)} mm.</span>` : "";
+
+                document.getElementById('resKonklusjonBoks').innerHTML = `
+                    <p class="text-sm"><b>Klatresikkerhet:</b><br>${klatreAnbefaling}</p>
+                    <hr class="my-2 border-gray-300">
+                    <p class="text-sm"><b>Vedlikehold & Levetid:</b><br>${vedlikehold}</p>
+                    ${advarsel}
+                `;
+
+                sisteBeregning = {
+                    netteier: document.getElementById('netteier').value || "Ukjent",
+                    linje: document.getElementById('linjeId').value || "Ukjent",
+                    mastepunkt: document.getElementById('mastepunktNr').value || "Ukjent",
+                    stolpe: document.getElementById('stolpeNr').value || "1",
+                    diameter: dia,
+                    skadehoyde: skadehoyde,
+                    type: specializedCSV,
+                    effRestskall:Box= effektivtRestskall.toFixed(0),
+                    sf: sf,
+                    restlevetid: levetid,
+                    konklusjon: renTekstKonklusjon
+                };
+
+                tegnTverrsnitt(category === 'reirhull' ? 'reirhull' : finalType, dia, effektivDiameter, effektivtRestskall, sf, skadehoyde, minSikkerhetsKrav, specializedDataObj);
+                document.getElementById('resultatSeksjon').classList.remove('hidden');
+                setTimeout(() => document.getElementById('resultatSeksjon').scrollIntoView({ behavior: 'smooth' }), 100);
+
+            } catch (e) {
+                alert("Feil under beregning. Sjekk inndataene.");
+            }
+        }
+    </script>
+</body>
+</html>
